@@ -13,8 +13,7 @@ jobs:
       before_script:
         - pip install -r requirements/local.txt
       script:
-        - "pre-commit install"
-        - "pre-commit"
+        - "pre-commit run --all"
 
     - name: "Django Test"
       before_install:

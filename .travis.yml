@@ -6,6 +6,7 @@ python:
 
 services:
   - postgresql
+
 jobs:
   include:
     - name: "Linter"

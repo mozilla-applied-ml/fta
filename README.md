@@ -24,15 +24,10 @@ Setup instructions
 Server should now be running at [localhost](http://localhost:8000)
 
 
-### Basic Commands
+### Useful commands
 
-* To create an **superuser account**, use this command:
-
-    $ python manage.py createsuperuser
-
-* To update static files:
-
-    $ python manage.py collectstatic
+* To create a superuser account: `./manage.py createsuperuser`
+* To update static files: `./manage.py collectstatic`
 
 
 ### Linting, testing, type-checking

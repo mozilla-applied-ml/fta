@@ -5,7 +5,9 @@
 
 Fathom Training App - Utils to help with training fathom
 
-## Setting up dev environment
+## Dev instructions
+
+### Setup
 
 Requires:
 * Postgres
@@ -21,13 +23,19 @@ Setup instructions
 
 Server should now be running at [localhost](http://localhost:8000)
 
+
 ### Basic Commands
 
 * To create an **superuser account**, use this command:
 
     $ python manage.py createsuperuser
 
-### Linting and checking
+* To update static files:
+
+    $ python manage.py collectstatic
+
+
+### Linting, testing, type-checking
 
 Running type checks with mypy: `mypy fta`
 
@@ -36,9 +44,6 @@ Other tests should run on pre-commit, or with:
 * `black .`
 * `isort`
 
-Test coverage
-^^^^^^^^^^^^^
-
 To run the tests, check your test coverage, and generate an HTML coverage report::
 
     $ coverage run -m pytest
@@ -46,13 +51,9 @@ To run the tests, check your test coverage, and generate an HTML coverage report
     $ open htmlcov/index.html
 
 Running tests with py.test
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-::
 
   $ pytest
 
-Deployment
-----------
+## Deployment
 
 The following details how to deploy this application.

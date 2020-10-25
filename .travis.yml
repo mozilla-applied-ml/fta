@@ -11,9 +11,10 @@ jobs:
   include:
     - name: "Linter"
       before_script:
-        - pip install -q flake8
+        - pip install -r requirements/local.txt
       script:
-        - "flake8"
+        - "pre-commit install"
+        - "pre-commit"
 
     - name: "Django Test"
       before_install:

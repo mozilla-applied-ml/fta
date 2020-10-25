@@ -12,8 +12,6 @@ urlpatterns = [
     path("accounts/", include("django.contrib.auth.urls")),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
-    # User management
-    path("users/", include("fta.users.urls", namespace="users")),
     # Your stuff: custom urls includes go here
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

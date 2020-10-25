@@ -6,7 +6,7 @@ from fta.users.tests.factories import UserFactory
 
 @pytest.fixture(autouse=True)
 def media_storage(settings, tmpdir):
-    settings.MEDIA_ROOT = tmpdir.strpath #afds
+    settings.MEDIA_ROOT = tmpdir.strpath
 
 
 @pytest.fixture

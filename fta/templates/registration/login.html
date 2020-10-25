@@ -1,0 +1,23 @@
+{% extends "registration/base.html" %}
+
+{% load i18n %}
+{% load crispy_forms_tags %}
+
+{% block head_title %}{% trans "Sign In" %}{% endblock %}
+
+{% block inner %}
+
+<h1>{% trans "Sign In" %}</h1>
+
+<p>{% blocktrans %}If you do not have an account, please contact FTA admin.{% endblocktrans %}</p>
+
+<form class="login" method="POST" action="{% url 'login' %}">
+  {% csrf_token %}
+  {{ form|crispy }}
+  {% if redirect_field_value %}
+  <input type="hidden" name="{{ redirect_field_name }}" value="{{ redirect_field_value }}" />
+  {% endif %}
+  <button class="primaryAction btn btn-primary" type="submit">{% trans "Sign In" %}</button>
+</form>
+
+{% endblock %}

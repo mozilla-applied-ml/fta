@@ -1,1 +1,14 @@
 {% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<h1>{% blocktrans %}Fathom Training App{% endblocktrans %}</h1>
+
+{% if request.user.is_authenticated %}
+
+{% else %}
+  {% url 'login' as login_url %}
+  <p>{% blocktrans %}You must be <b><a href="{{ login_url }}">logged in</a></b> to use this app.{% endblocktrans %}</p>
+{% endif %}
+
+{% endblock content %}

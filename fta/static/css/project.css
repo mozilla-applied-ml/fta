@@ -1,4 +1,8 @@
-/* These styles are generated from project.scss. */
+.mb-1 img {
+  height: 20px;
+  width: auto;
+  vertical-align: baseline;
+}
 
 .alert-debug {
   color: black;

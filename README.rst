@@ -1,6 +1,9 @@
 FTA
 ===
 
+.. image:: https://travis-ci.org/mozilla/fta.svg?branch=main
+  :target: https://travis-ci.org/mozilla/fta
+
 Fathom Training App - Utils to help with training fathom
 
 Settings

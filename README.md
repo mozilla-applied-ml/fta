@@ -1,4 +1,4 @@
-#FTA
+# FTA
 
 [![Build Status](https://travis-ci.org/mozilla/fta.svg?branch=main)](https://travis-ci.org/mozilla/fta)
 

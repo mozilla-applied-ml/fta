@@ -18,7 +18,6 @@ Setup instructions
 * `pre-commit install`
 * `createdb <dbname> -U postgres --password <password>`
 * make a `.env` file, and add line `export DATABASE_URL=postgres://postgres:<password>@127.0.0.1:5432/<dbname>`
-* `source .env`
 * `./manage.py migrate`
 * `./manage.py runserver`
 

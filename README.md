@@ -30,11 +30,9 @@ Server should now be running at [localhost](http://localhost:8000)
 * To update static files: `./manage.py collectstatic`
 
 
-### Linting, testing, type-checking
+### Linting and testing
 
-Running type checks with mypy: `mypy fta`
-
-Other tests should run on pre-commit, or with:
+Linting should run on pre-commit, or with:
 * `flake8`
 * `black .`
 * `isort`

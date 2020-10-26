@@ -19,9 +19,14 @@ class Sample(models.Model):
     freeze_time = models.DateTimeField(
         verbose_name="Time of page freezing",
     )
-
     # Optional
     notes = models.TextField(
+        null=True,
+        blank=True,
+    )
+    freeze_software = models.CharField(
+        verbose_name="Software used for freezing",
+        max_length=200,
         null=True,
         blank=True,
     )

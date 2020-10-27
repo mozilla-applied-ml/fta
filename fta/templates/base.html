@@ -48,6 +48,9 @@
             <li class="nav-item active">
               <a class="nav-link" href="{% url 'home' %}">Home <span class="sr-only">(current)</span></a>
             </li>
+              <li class="nav-item">
+                <a class="nav-link" href="{% url 'add_sample' %}">{% trans "Add Sample" %}</a>
+              </li>
             {% if request.user.is_authenticated %}
               <li class="nav-item">
                 <a class="nav-link" href="{% url 'admin:index' %}">{% trans "Admin" %}</a>

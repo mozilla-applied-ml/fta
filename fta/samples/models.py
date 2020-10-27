@@ -1,5 +1,8 @@
 from django.db import models
 
+# These are the freezers we know how to parse the meta data from
+SAMPLE_SOFTWARE_PARSERS = (("SinglePage", "SinglePage"), ("freezedry", "freezedry"))
+
 
 # Create your models here.
 class Sample(models.Model):
@@ -32,6 +35,11 @@ class Sample(models.Model):
     )
     page_size = models.IntegerField(
         verbose_name="Page size",
+        help_text="This is updated on save, don't bother manually changing.",
         blank=True,
         null=True,
     )
+
+    def save(self, *args, **kwargs):
+        self.page_size = len(self.frozen_page.encode("utf-8"))
+        super().save(*args, **kwargs)

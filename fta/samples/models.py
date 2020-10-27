@@ -43,3 +43,7 @@ class Sample(models.Model):
     def save(self, *args, **kwargs):
         self.page_size = len(self.frozen_page.encode("utf-8"))
         super().save(*args, **kwargs)
+
+
+class Label(models.Model):
+    pass

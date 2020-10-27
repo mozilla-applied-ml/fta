@@ -3,12 +3,12 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.utils.encoding import smart_str
+from django.views.generic import ListView
 from django.views.generic.edit import FormView
 
-from .forms import UploadSampleForm
+from .forms import SampleLabelForm, UploadSampleForm
 from .models import Sample
 
 
@@ -47,6 +47,16 @@ class UploadSampleView(LoginRequiredMixin, FormView):
                 freeze_software=freeze_software,
                 notes=data["notes"],
             )
-            return HttpResponseRedirect("add_sample")
+            return redirect("list_samples")
         else:
             return render(request, self.template_name, {"form": form})
+
+
+class SampleListView(LoginRequiredMixin, ListView):
+    model = Sample
+    template_name = "samples/list_samples.html"
+
+
+class SampleLabelView(LoginRequiredMixin, FormView):
+    template_name = "samples/label_sample.html"
+    form_class = SampleLabelForm

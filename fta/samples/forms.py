@@ -2,7 +2,7 @@ from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit
 from django import forms
 
-from .models import SAMPLE_SOFTWARE_PARSERS, Sample
+from .models import SAMPLE_SOFTWARE_PARSERS, Label, Sample
 
 
 # Create the form class.
@@ -21,3 +21,14 @@ class UploadSampleForm(forms.ModelForm):
     )
     frozen_page = forms.FileField()
     notes = forms.CharField(required=False)
+
+
+class SampleLabelForm(forms.ModelForm):
+    class Meta:
+        model = Label
+        fields = []
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.helper = FormHelper()
+        self.helper.add_input(Submit("submit", "Submit"))

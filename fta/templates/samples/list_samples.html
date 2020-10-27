@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% load i18n %}
+
+{% block content %}
+<h2>{% blocktrans %}Samples{% endblocktrans %}</h2>
+  {% if sample_list %}
+  <ul>
+    {% for sample in sample_list %}
+      <li>
+        <a href="{% url 'label'%}?sample_id={{ sample.id }}">{{ sample.id }} - {{ sample.url }} - ({{ sample.freeze_software }})</a>
+      </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p>There are no samples.</p>
+  {% endif %}
+{% endblock content %}

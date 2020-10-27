@@ -6,7 +6,7 @@ from django.views import defaults as default_views
 from django.views.generic import TemplateView
 from rest_framework.authtoken.views import obtain_auth_token
 
-from fta.samples.views import UploadSampleView
+from fta.samples import views as sample_views
 
 urlpatterns = [
     path("", TemplateView.as_view(template_name="pages/home.html"), name="home"),
@@ -15,7 +15,9 @@ urlpatterns = [
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # Your stuff: custom urls includes go here
-    path("add_sample", UploadSampleView.as_view(), name="add_sample"),
+    path("add_sample", sample_views.UploadSampleView.as_view(), name="add_sample"),
+    path("samples", sample_views.SampleListView.as_view(), name="list_samples"),
+    path("label", sample_views.SampleLabelView.as_view(), name="label"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # API URLS

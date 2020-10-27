@@ -10,11 +10,6 @@
 <h2>{% blocktrans %}Label sample {{ sample.pk }}{% endblocktrans %}</h2>
 {% crispy form %}
 
-<!-- Sticking in here as can't get iframe to render-->
-<div style="height: 100px; overflow: scroll;">
-<code>{{ sample.frozen_page|escape}}</code>
-</div>
-
 <iframe id="iframe" width="1024" height="768" srcdoc="{{ sample.frozen_page|escape }}"></iframe>
 
 {% endblock content %}

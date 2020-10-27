@@ -11,7 +11,7 @@
 <code>{{ sample.frozen_page|escape}}</code>
 </div>
 
-<iframe id="iframe" width=1024 height=768 srcdoc={{ sample.frozen_page|escape }}></iframe>
+<iframe id="iframe" width="1024" height="768" srcdoc="{{ sample.frozen_page|escape }}"></iframe>
 
 {% endblock content %}
 {% block extrajavascript %}

@@ -1,5 +1,5 @@
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit
+from crispy_forms.layout import Button, Submit
 from django import forms
 
 from .models import SAMPLE_SOFTWARE_PARSERS, Label, Sample
@@ -32,3 +32,11 @@ class SampleLabelForm(forms.ModelForm):
         super().__init__(*args, **kwargs)
         self.helper = FormHelper()
         self.helper.add_input(Submit("submit", "Submit"))
+        self.helper.add_input(
+            Button(
+                name="btn-pick",
+                value="Toggle element picking",
+                css_id="btn-pick",
+                css_class="btn-light",
+            )
+        )

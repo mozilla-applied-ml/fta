@@ -60,3 +60,10 @@ class SampleListView(LoginRequiredMixin, ListView):
 class SampleLabelView(LoginRequiredMixin, FormView):
     template_name = "samples/label_sample.html"
     form_class = SampleLabelForm
+
+    def get_context_data(self, **kwargs):
+        # Call the base implementation first to get a context
+        context = super().get_context_data(**kwargs)
+        # This is not robust :D
+        context["sample"] = Sample.objects.get(pk=int(self.request.GET["sample_id"]))
+        return context

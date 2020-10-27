@@ -7,10 +7,10 @@ class Sample(models.Model):
     # May want to change to external storage later.
 
     # Required
-    frozen_page = models.BinaryField(
-        verbose_name="Blob of freeze-dried page",
+    frozen_page = models.TextField(
+        verbose_name="Freeze-dried page",
         blank=False,
-        editable=True,
+        max_length=None,
     )
     url = models.URLField(
         verbose_name="Url or frozen page",
@@ -29,4 +29,9 @@ class Sample(models.Model):
         max_length=200,
         null=True,
         blank=True,
+    )
+    page_size = models.IntegerField(
+        verbose_name="Page size",
+        blank=True,
+        null=True,
     )

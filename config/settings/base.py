@@ -262,3 +262,4 @@ REST_FRAMEWORK = {
 CORS_URLS_REGEX = r"^/api/.*$"
 # Your stuff...
 # ------------------------------------------------------------------------------
+DATA_UPLOAD_MAX_MEMORY_SIZE = 250000000

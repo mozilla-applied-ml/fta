@@ -205,7 +205,12 @@ function handleIframeLoaded() {
 }
 
 document.addEventListener("DOMContentLoaded", function() {
-    document.getElementById("iframe").addEventListener("load", handleIframeLoaded);
+    const iframe = document.getElementById("iframe");
+    if (iframe.contentDocument !== null) {
+        handleIframeLoaded();
+    } else {
+        iframe.addEventListener("load", handleIframeLoaded);
+    }
 });
 </script>
 {% endblock extrajavascript %}

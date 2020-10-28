@@ -11,10 +11,14 @@
 {% crispy form %}
 
 <iframe id="iframe" width="1024" height="768" srcdoc="{{ sample.frozen_page|escape }}"></iframe>
+<br/>
+<textarea id="json_output" style="width: 1024px; height: 200px;"></textarea>
 
 {% endblock content %}
 {% block extrajavascript %}
-<script>
+<script type="module">
+import { v4 as uuidv4 } from 'https://jspm.dev/uuid@8.3.1';
+
 // Create a new DOM element with tag `tag`, set attributes in `attrs`.
 // If `attrs` contains inner objects that exist in the created element, recurse
 // and set nested properties, eg. element.style.display.
@@ -77,13 +81,11 @@ function createOverlayForPickedElement(iframe, pickedElement, pickedElementsMap)
         transition: "none", // These should track scrolling without animations
     });
 
-    const displayValue = (pickedElement.dataset.fathom || "");
-
     // Inner div to display tag value with text input and remove button
     const innerDiv = $new("div", {
         style: {
             position: "relative",
-            width: displayValue.length + "em",
+            width: "6em",
             "pointer-events": "auto",
         },
     });
@@ -92,7 +94,7 @@ function createOverlayForPickedElement(iframe, pickedElement, pickedElementsMap)
         className: "tag-input",
         type: "text",
         style: "width: 100%; min-width: 10em;",
-        value: displayValue,
+        value: "",
     });
 
     const removeButton = $new("button", {
@@ -102,7 +104,6 @@ function createOverlayForPickedElement(iframe, pickedElement, pickedElementsMap)
     });
     removeButton.addEventListener("click", function(e) {
         taggedOverlay.parentElement.removeChild(taggedOverlay);
-        delete pickedElement.dataset.fathom;
         pickedElementsMap.delete(pickedElement);
     });
 
@@ -129,29 +130,39 @@ function createOverlayForPickedElement(iframe, pickedElement, pickedElementsMap)
 
     // Track edits to input field in data-fathom attribute
     tagInput.addEventListener("input", function(e) {
-        if (e.target.value !== "") {
-            pickedElement.dataset.fathom = e.target.value;
-        } else {
-            delete pickedElement.dataset.fathom;
-        }
+        pickedElementsMap.get(pickedElement).tag = e.target.value;
     });
 
     return taggedOverlay;
 }
 
+function handleFormSubmit(iframe, pickedElementsMap, submitEvt) {
+    let labelData = [];
+    for (const [element, data] of pickedElementsMap) {
+        const id = uuidv4();
+        element.dataset["fta_id"] = id;
+        labelData.push({id, tag: data.tag});
+    }
+
+    const submission = {
+        modifiedPage: iframe.contentDocument.documentElement.innerHTML,
+        labelData,
+    };
+
+    //TODO: set on form input instead of just logging when backend is ready
+    document.getElementById("json_output").value = JSON.stringify(submission);
+
+    //TODO: prevent form submission for development until we have the backend ready
+    submitEvt.preventDefault();
+    return false;
+}
+
 function handleIframeLoaded() {
     const iframe = document.getElementById("iframe");
     const subdoc = iframe.contentDocument;
-    const tagInput = document.getElementById("tag-input");
-    const identifier = document.getElementById("identifier");
 
     // Map of picked elements to corresponding overlay div
     let pickedElementsMap = new Map();
-
-    // Prevent users from clicking links in captured bundles
-    subdoc.body.addEventListener("click", function(e) {
-        e.preventDefault();
-    });
 
     // Controls element picker visibility
     let picking = true;
@@ -175,11 +186,16 @@ function handleIframeLoaded() {
         if (!picking) {
             return;
         }
+        // Prevent users from clicking links in captured bundles
+        e.preventDefault();
         e.stopPropagation();
         if (!pickedElementsMap.has(e.target)) {
             const overlay = createOverlayForPickedElement(iframe, e.target, pickedElementsMap);
             overlay.querySelector(".tag-input").focus();
-            pickedElementsMap.set(e.target, overlay);
+            pickedElementsMap.set(e.target, {
+                overlay: overlay,
+                tag: "",
+            });
         }
     }
 
@@ -188,11 +204,12 @@ function handleIframeLoaded() {
         el.addEventListener("mouseover", hoverHandler);
         el.addEventListener("click", clickHandler);
 
-        // Highlight existing tagged elements
-        if (el.dataset.fathom) {
-            const overlay = createOverlayForPickedElement(iframe, el, pickedElementsMap);
-            pickedElementsMap.set(el, overlay);
-        }
+        //TODO: makes this work with an external labelData
+        // // Highlight existing tagged elements
+        // if (el.dataset.fathom) {
+        //     const overlay = createOverlayForPickedElement(iframe, el, pickedElementsMap);
+        //     pickedElementsMap.set(el, overlay);
+        // }
     }
 
     document.getElementById("btn-pick").addEventListener("click", function() {
@@ -201,6 +218,11 @@ function handleIframeLoaded() {
             overlay.style.width = "0px";
             overlay.style.height = "0px";
         }
+    });
+
+    //TODO: add id to form
+    document.querySelector(".container-fluid > form").addEventListener("submit", function(e) {
+        return handleFormSubmit(iframe, pickedElementsMap, e);
     });
 }
 

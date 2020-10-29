@@ -1,15 +1,17 @@
+import json
 from datetime import datetime
 
 from bs4 import BeautifulSoup
 from dateutil.parser import parse
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.http import Http404
 from django.shortcuts import redirect, render
 from django.utils.encoding import smart_str
 from django.views.generic import ListView
 from django.views.generic.edit import FormView
 
 from .forms import SampleLabelForm, UploadSampleForm
-from .models import Sample
+from .models import LabeledSample, Sample
 
 
 def get_frozen_metadata(page, freeze_software):
@@ -61,9 +63,32 @@ class SampleLabelView(LoginRequiredMixin, FormView):
     template_name = "samples/label_sample.html"
     form_class = SampleLabelForm
 
+    def dispatch(self, request, *args, **kwargs):
+        requested_sample_id = kwargs["sample"]
+        try:
+            sample = Sample.objects.get(pk=requested_sample_id)
+            self.sample, created = LabeledSample.objects.get_or_create(
+                original_sample=sample
+            )
+            if created:
+                self.sample.modified_sample = sample.frozen_page
+                self.sample.save()
+            return super().dispatch(request, *args, **kwargs)
+        except Sample.DoesNotExist:
+            raise Http404(f"Sample does not exist with ID {requested_sample_id}")
+
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
         # This is not robust :D
-        context["sample"] = Sample.objects.get(pk=int(self.request.GET["sample_id"]))
+        context["frozen_page"] = self.sample.modified_sample
         return context
+
+    def post(self, request, *args, **kwargs):
+        # We're willy nilly saving user input into database
+        # This is only okay while all this is behind a login.
+        self.sample.modified_sample = request.POST["updated-sample"]
+        # To do, add labels
+        labels = json.loads(request.POST["label-data"])
+        print(labels)
+        return super().post(request, *args, **kwargs)

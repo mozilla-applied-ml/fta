@@ -1,10 +1,15 @@
-from rest_framework import viewsets
+from rest_framework import mixins, viewsets
 
 from ..models import Sample
 from .serializers import SampleListSerializer, SampleSerializer
 
 
-class SampleViewSet(viewsets.ModelViewSet):
+class SampleViewSet(
+    mixins.CreateModelMixin,
+    mixins.ListModelMixin,
+    mixins.RetrieveModelMixin,
+    viewsets.GenericViewSet,
+):
     serializer_class = SampleSerializer
     queryset = Sample.objects.all()
 
@@ -14,9 +19,6 @@ class SampleViewSet(viewsets.ModelViewSet):
             "list": SampleListSerializer,
             "create": SampleSerializer,
             "retrieve": SampleSerializer,
-            "update": SampleSerializer,
-            "partial_update": SampleSerializer,
-            "destroy": SampleSerializer,
         }
 
     def get_serializer_class(self, *args, **kwargs):

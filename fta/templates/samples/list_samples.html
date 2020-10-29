@@ -7,7 +7,7 @@
   <ul>
     {% for sample in sample_list %}
       <li>
-        <a href="{% url 'label'%}?sample_id={{ sample.id }}">{{ sample.id }} - {{ sample.url }} - ({{ sample.freeze_software }})</a>
+        <a href="{% url 'label' sample.id %}">{{ sample.id }} - {{ sample.url }} - ({{ sample.freeze_software }})</a>
       </li>
     {% endfor %}
   </ul>

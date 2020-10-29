@@ -17,7 +17,7 @@ urlpatterns = [
     # Your stuff: custom urls includes go here
     path("add_sample", sample_views.UploadSampleView.as_view(), name="add_sample"),
     path("samples", sample_views.SampleListView.as_view(), name="list_samples"),
-    path("label", sample_views.SampleLabelView.as_view(), name="label"),
+    path("label/<int:sample>", sample_views.SampleLabelView.as_view(), name="label"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
 # API URLS

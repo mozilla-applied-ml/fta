@@ -78,16 +78,23 @@ class LabeledSample(models.Model):
         max_length=None,
     )
 
+    def __str__(self):
+        return f"{self.original_sample.pk} - {self.original_sample.url}"
+
 
 class Label(models.Model):
     slug = models.SlugField(
         blank=False,
         null=False,
         help_text="data-fathom - This is the slug that populates data-fathom.",
+        unique=True,
     )
     description = models.TextField(
         blank=True, null=True, help_text="Description of label."
     )
+
+    def __str__(self):
+        return self.slug
 
 
 class LabeledElement(models.Model):

@@ -5,13 +5,13 @@ from bs4 import BeautifulSoup
 from dateutil.parser import parse
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, reverse
 from django.utils.encoding import smart_str
 from django.views.generic import ListView
 from django.views.generic.edit import FormView
 
 from .forms import SampleLabelForm, UploadSampleForm
-from .models import LabeledSample, Sample
+from .models import Label, LabeledElement, LabeledSample, Sample
 
 
 def get_frozen_metadata(page, freeze_software):
@@ -63,6 +63,9 @@ class SampleLabelView(LoginRequiredMixin, FormView):
     template_name = "samples/label_sample.html"
     form_class = SampleLabelForm
 
+    def get_success_url(self):
+        return reverse("list_samples")
+
     def dispatch(self, request, *args, **kwargs):
         requested_sample_id = kwargs["sample"]
         try:
@@ -80,15 +83,19 @@ class SampleLabelView(LoginRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
-        # This is not robust :D
         context["frozen_page"] = self.sample.modified_sample
         return context
 
     def post(self, request, *args, **kwargs):
         # We're willy nilly saving user input into database
-        # This is only okay while all this is behind a login.
-        self.sample.modified_sample = request.POST["updated-sample"]
-        # To do, add labels
-        labels = json.loads(request.POST["label-data"])
-        print(labels)
+        # This is only okay while all this is behind a managed login.
+        self.sample.modified_sample = request.POST.get("updated-sample", "")
+        label_data_list = json.loads(request.POST.get("label-data", ""))
+        for label_data in label_data_list:
+            label, _ = Label.objects.get_or_create(slug=label_data["label"])
+            LabeledElement.objects.get_or_create(
+                labeled_sample=self.sample,
+                data_fta_id=label_data["fta_id"],
+                label=label,
+            )
         return super().post(request, *args, **kwargs)

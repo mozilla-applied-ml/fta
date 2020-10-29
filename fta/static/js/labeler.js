@@ -123,7 +123,10 @@ function handleFormSubmit(iframe, pickedElementsMap) {
     for (const [element, data] of pickedElementsMap) {
         const id = uuidv4();
         element.dataset["fta_id"] = id;
-        labelData.push({id, tag: data.tag});
+        labelData.push({
+            fta_id: id,
+            label: data.tag
+        });
     }
     document.querySelector("input[name='label-data']").value = JSON.stringify(labelData);
     document.querySelector("input[name='updated-sample']").value = iframe.contentDocument.documentElement.innerHTML;

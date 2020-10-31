@@ -1,5 +1,4 @@
-import { v4 as uuidv4 } from 'https://jspm.dev/uuid@8.3.1';
-
+import { v4 as uuidv4 } from "https://jspm.dev/uuid@8.3.1";
 
 // Create a new DOM element with tag `tag`, set attributes in `attrs`.
 // If `attrs` contains inner objects that exist in the created element, recurse
@@ -7,7 +6,7 @@ import { v4 as uuidv4 } from 'https://jspm.dev/uuid@8.3.1';
 function $new(tag, attrs) {
     function set_attrs(target, attrs) {
         for (const property in attrs) {
-            if (typeof(attrs[property]) === "object" && typeof(target[property]) !== "undefined") {
+            if (typeof attrs[property] === "object" && typeof target[property] !== "undefined") {
                 set_attrs(target[property], attrs[property]);
             } else {
                 target[property] = attrs[property];
@@ -132,15 +131,15 @@ function handleFormSubmit(iframe, pickedElementsMap) {
     document.querySelector("input[name='updated-sample']").value = iframe.contentDocument.documentElement.innerHTML;
 }
 
-function handleIframeLoaded() {
-    const iframe = document.getElementById("iframe");
+// Create element picking and labeling UI for a loaded iframe
+function createPickingUiForIframe({iframe, toggleBtn, submitBtn, startPicking = true}) {
     const subdoc = iframe.contentDocument;
 
     // Map of picked elements to corresponding overlay div
     let pickedElementsMap = new Map();
 
     // Controls element picker visibility
-    let picking = true;
+    let picking = startPicking;
 
     // Overlay element lives in this document to avoid polutting the iframe
     // document as much as possible. We simply reposition it over the
@@ -187,24 +186,21 @@ function handleIframeLoaded() {
         // }
     }
 
-    document.getElementById("toggle-picking").addEventListener("click", function() {
-        picking = !picking;
-        if (!picking) {
-            overlay.style.width = "0px";
-            overlay.style.height = "0px";
-        }
-    });
+    if (typeof toggleBtn !== "undefined") {
+        toggleBtn.addEventListener("click", function() {
+            picking = !picking;
+            if (!picking) {
+                overlay.style.width = "0px";
+                overlay.style.height = "0px";
+            }
+        });
+    }
 
-    document.getElementById("submit-labels").addEventListener("click", function() {
-        handleFormSubmit(iframe, pickedElementsMap);
-    });
+    if (typeof submitBtn !== "undefined") {
+        submitBtn.addEventListener("click", function() {
+            handleFormSubmit(iframe, pickedElementsMap);
+        });
+    }
 }
 
-document.addEventListener("DOMContentLoaded", function() {
-    const iframe = document.getElementById("iframe");
-    if (iframe.contentDocument !== null) {
-        handleIframeLoaded();
-    } else {
-        iframe.addEventListener("load", handleIframeLoaded);
-    }
-});
+export { createPickingUiForIframe };

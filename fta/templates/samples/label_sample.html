@@ -14,5 +14,20 @@
 
 {% endblock content %}
 {% block extrajavascript %}
-<script type="module" src="{% static 'js/labeler.js' %}"></script>
+<script type="module">
+import { createPickingUiForIframe } from "{% static 'js/labeler.js' %}";
+
+document.addEventListener("DOMContentLoaded", function() {
+    const iframe = document.getElementById("iframe");
+    const toggleBtn = document.getElementById("toggle-picking");
+    const submitBtn = document.getElementById("submit-labels");
+    if (iframe.contentDocument !== null) {
+        createPickingUiForIframe({iframe, toggleBtn, submitBtn});
+    } else {
+        iframe.addEventListener("load", function() {
+            createPickingUiForIframe({iframe, toggleBtn, submitBtn});
+        });
+    }
+});
+</script>
 {% endblock extrajavascript %}

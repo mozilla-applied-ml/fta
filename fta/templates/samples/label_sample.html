@@ -7,10 +7,20 @@
 {% endblock extrahead %}
 
 {% block content %}
-<h2>{% blocktrans %}Label sample{% endblocktrans %}</h2>
+<h2>{% trans "Label sample" %}</h2>
+<dl>
+  <dt>{% trans "id" %}</dt>
+  <dd>{{ sample.id }}</dd>
+  <dt>{% trans "url" %}</dt>
+  <dd>{{ sample.original_sample.url }}</dd>
+  <dt>{% trans "Saved labels" %}</dt>
+  <dd>{% for l in labels %} {{ l.label }}{% if not forloop.last %},{% endif %} {% endfor %}</dd>
+  <dt>{% trans "Label editing" %}</dt>
+  <dd><input type="checkbox" id="toggle-picking"></dd>
+</dl>
 {% crispy form %}
 
-<iframe id="iframe" width="1024" height="768" srcdoc="{{ frozen_page|escape }}"></iframe>
+<iframe id="iframe" width="1024" height="768" srcdoc="{{ sample.modified_sample|escape }}"></iframe>
 
 {% endblock content %}
 {% block extrajavascript %}
@@ -21,11 +31,19 @@ document.addEventListener("DOMContentLoaded", function() {
     const iframe = document.getElementById("iframe");
     const toggleBtn = document.getElementById("toggle-picking");
     const submitBtn = document.getElementById("submit-labels");
+    const startPicking = document.getElementById("toggle-picking").checked;
+    let pickedElementsMap = new Map();
+    {% if labels %}
+
+    {% endif %}
+    const initializer = {
+      iframe, toggleBtn, submitBtn, pickedElementsMap, startPicking
+    };
     if (iframe.contentDocument !== null) {
-        createPickingUiForIframe({iframe, toggleBtn, submitBtn});
+        createPickingUiForIframe(initializer);
     } else {
         iframe.addEventListener("load", function() {
-            createPickingUiForIframe({iframe, toggleBtn, submitBtn});
+            createPickingUiForIframe(initializer);
         });
     }
 });

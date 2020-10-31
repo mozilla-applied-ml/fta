@@ -142,13 +142,20 @@ function handleFormSubmit(iframe, pickedElementsMap) {
 }
 
 // Create element picking and labeling UI for a loaded iframe
-function createPickingUiForIframe({iframe, toggleBtn, submitBtn, startPicking = true}) {
+function createPickingUiForIframe({
+        // iFrame content
+        iframe,
+        // Toggle picker on and off
+        toggleBtn,
+        // Form submit button
+        submitBtn,
+        // Map of picked elements to corresponding overlay div
+        pickedElementsMap=new Map(),
+        // Should picker be active on launch
+        startPicking=true,
+    }) {
+
     const subdoc = iframe.contentDocument;
-
-    // Map of picked elements to corresponding overlay div
-    let pickedElementsMap = new Map();
-
-    // Controls element picker visibility
     let picking = startPicking;
 
     // Overlay element lives in this document to avoid polutting the iframe

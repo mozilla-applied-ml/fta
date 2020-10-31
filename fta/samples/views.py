@@ -64,7 +64,7 @@ class SampleLabelView(LoginRequiredMixin, FormView):
     form_class = SampleLabelForm
 
     def get_success_url(self):
-        return reverse("list_samples")
+        return reverse("label", kwargs=dict(sample=f"{self.sample.original_sample.id}"))
 
     def dispatch(self, request, *args, **kwargs):
         requested_sample_id = kwargs["sample"]
@@ -83,7 +83,8 @@ class SampleLabelView(LoginRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
-        context["frozen_page"] = self.sample.modified_sample
+        context["sample"] = self.sample
+        context["labels"] = LabeledElement.objects.filter(labeled_sample=self.sample)
         return context
 
     def post(self, request, *args, **kwargs):

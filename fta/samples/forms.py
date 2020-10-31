@@ -35,14 +35,6 @@ class SampleLabelForm(forms.Form):
             )
         )
         self.helper.add_input(
-            layout.Button(
-                name="toggle-picking",
-                value="Toggle element picking",
-                css_id="toggle-picking",
-                css_class="btn-light",
-            )
-        )
-        self.helper.add_input(
             layout.Hidden(
                 name="updated-sample",
                 value="updated-sample",

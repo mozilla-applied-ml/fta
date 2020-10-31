@@ -15,7 +15,7 @@ class LabelAdmin(admin.ModelAdmin):
 
 @admin.register(LabeledElement)
 class LabeledElementAdmin(admin.ModelAdmin):
-    list_display = ("labeled_sample", "label", "data_fta_id")
+    list_display = ("id", "labeled_sample", "label", "data_fta_id")
 
 
 admin.site.register(LabeledSample)

@@ -119,13 +119,19 @@ function createOverlayForPickedElement(iframe, pickedElement, pickedElementsMap)
 
 function handleFormSubmit(iframe, pickedElementsMap) {
     let labelData = [];
+    let id = '';
+
     for (const [element, data] of pickedElementsMap) {
         const label = data.tag;
         if (label === "") {
             continue;
         }
-        const id = uuidv4();
-        element.dataset["fta_id"] = id;
+        if (element.dataset.hasOwnProperty('fta_id')) {
+            id = element.dataset.fta_id;
+        } else {
+            id = uuidv4();
+            element.dataset["fta_id"] = id;
+        }
         labelData.push({
             fta_id: id,
             label: data.tag

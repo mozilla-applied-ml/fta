@@ -121,6 +121,10 @@ function createOverlayForPickedElement(iframe, pickedElement, pickedElementsMap)
 function handleFormSubmit(iframe, pickedElementsMap) {
     let labelData = [];
     for (const [element, data] of pickedElementsMap) {
+        const label = data.tag;
+        if (label === "") {
+            continue;
+        }
         const id = uuidv4();
         element.dataset["fta_id"] = id;
         labelData.push({

@@ -36,10 +36,13 @@ class SampleTable(tables.Table):
         )
 
     def render_labels(self, value, record):
-        labeled_elements = record.labeledsample.labeledelement_set.all()
-        labels = labeled_elements.values_list("label__slug", flat=True).distinct()
-        label_links = [f'<a href="?label={label}">{label}</a>' for label in labels]
-        return format_html(", ".join(label_links))
+        if hasattr(record, "labeledsample"):
+            labeled_elements = record.labeledsample.labeledelement_set.all()
+            labels = labeled_elements.values_list("label__slug", flat=True).distinct()
+            label_links = [f'<a href="?label={label}">{label}</a>' for label in labels]
+            return format_html(", ".join(label_links))
+        else:
+            return ""
 
     def render_page_size(self, value, record):
         return humansize(value)

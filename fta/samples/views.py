@@ -102,16 +102,21 @@ class UploadSampleView(LoginRequiredMixin, FormView):
         # Defaults
         url = ""
         freeze_time = datetime.now()
-        if freeze_software == "SinglePage":
-            soup = BeautifulSoup(page)
-            singlefile_comment = soup.html.contents[0]
-            pieces = singlefile_comment.strip().split("\n")
-            assert pieces[0].startswith("Page saved with SingleFile")
-            assert len(pieces) == 3
-            url = pieces[1].split("url:")[1].strip()
-            raw_time = pieces[2].split("date:")[1].strip().split("(")[0]
-            freeze_time = parse(raw_time)
-        return url, freeze_time
+        try:
+            if freeze_software == "SinglePage":
+                soup = BeautifulSoup(page)
+                singlefile_comment = soup.html.contents[0]
+                pieces = singlefile_comment.strip().split("\n")
+                assert pieces[0].startswith("Page saved with SingleFile")
+                assert len(pieces) == 3
+                url = pieces[1].split("url:")[1].strip()
+                raw_time = pieces[2].split("date:")[1].strip().split("(")[0]
+                freeze_time = parse(raw_time)
+        except:  # noqa
+            # It's okay if it fails. It just means freeze_software declaration
+            # was probably wrong, so set to unknown.
+            freeze_software = "Unknown"
+        return url, freeze_time, freeze_software
 
     def post(self, request, *args, **kwargs):
         # We're just going to manually validate this.
@@ -120,7 +125,9 @@ class UploadSampleView(LoginRequiredMixin, FormView):
             data = form.cleaned_data
             frozen_page = smart_str(data["frozen_page"].read())
             freeze_software = data["freeze_software"]
-            url, freeze_time = self.get_frozen_metadata(frozen_page, freeze_software)
+            url, freeze_time, freeze_software = self.get_frozen_metadata(
+                frozen_page, freeze_software
+            )
             Sample.objects.create(
                 frozen_page=frozen_page,
                 url=url,

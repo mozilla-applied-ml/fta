@@ -118,3 +118,7 @@ class LabeledElement(models.Model):
         null=False,
         help_text="data-fta_id - This is the id in the Labeled Sample.",
     )
+
+    class Meta:
+        # Can't have more than one label for a field
+        unique_together = ["data_fta_id", "labeled_sample"]

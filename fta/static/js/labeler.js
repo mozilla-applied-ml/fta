@@ -194,12 +194,15 @@ function createPickingUiForIframe({
 
     // Stop element picker, set picked element and focus tag input
     function clickHandler(e) {
+        // Always prevent users from clicking links in captured bundles
+        e.preventDefault();
+        e.stopPropagation();
+
         if (!picking) {
             return;
         }
-        // Prevent users from clicking links in captured bundles
-        e.preventDefault();
-        e.stopPropagation();
+
+        // Create empty overlays if picking and not already in map
         if (!pickedElementsMap.has(e.target)) {
             const overlay = createOverlayForPickedElement(iframe, e.target, pickedElementsMap);
             overlay.querySelector(".tag-input").focus();

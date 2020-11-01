@@ -16,7 +16,7 @@
   <dt>{% trans "Saved labels" %}</dt>
   <dd>
     {% if labels %}
-      {% for l in labels %} {{ l.label }}{% if not forloop.last %},{% endif %} {% endfor %}
+      {{ labels }}
     {% else %}
       {% trans "None" %}
     {% endif %}
@@ -42,7 +42,7 @@ document.addEventListener("DOMContentLoaded", function() {
 
     function updatePickedElementsMap({iframe, pickedElementsMap}) {
       let element = null;
-      {% for label in labels %}
+      {% for label in labeled_elements %}
         element = iframe.contentDocument.querySelector("[data-fta_id='{{ label.data_fta_id }}']")
         pickedElementsMap.set(element, {
             overlay: null,

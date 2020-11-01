@@ -1,17 +1,14 @@
 {% extends "base.html" %}
 {% load i18n %}
+{% load render_table from django_tables2 %}
 
 {% block content %}
 <h2>{% blocktrans %}Samples{% endblocktrans %}</h2>
-  {% if sample_list %}
-  <ul>
-    {% for sample in sample_list %}
-      <li>
-        <a href="{% url 'label' sample.id %}">{{ sample.id }} - {{ sample.url }} - ({{ sample.freeze_software }})</a>
-      </li>
-    {% endfor %}
-  </ul>
-  {% else %}
-    <p>There are no samples.</p>
-  {% endif %}
+{% if request.GET.label %}
+<p>Table is filtered to samples with label "{{ request.GET.label }}". <a href="{% url 'list_samples' %}">Clear filter</a></p>
+{% else %}
+<p>Click a label to filter table by existing labels.</p>
+{% endif %}
+<p>You can click on a table heading to sort.</p>
+{% render_table table %}
 {% endblock content %}

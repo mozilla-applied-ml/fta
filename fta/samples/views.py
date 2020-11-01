@@ -7,56 +7,30 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import Http404
 from django.shortcuts import redirect, render, reverse
 from django.utils.encoding import smart_str
-from django.views.generic import ListView
 from django.views.generic.edit import FormView
+from django_tables2 import SingleTableView
 
 from .forms import SampleLabelForm, UploadSampleForm
 from .models import Label, LabeledElement, LabeledSample, Sample
+from .tables import SampleTable
 
 
-def get_frozen_metadata(page, freeze_software):
-    # Defaults
-    url = ""
-    freeze_time = datetime.now()
-    if freeze_software == "SinglePage":
-        soup = BeautifulSoup(page)
-        singlefile_comment = soup.html.contents[0]
-        pieces = singlefile_comment.strip().split("\n")
-        assert pieces[0].startswith("Page saved with SingleFile")
-        assert len(pieces) == 3
-        url = pieces[1].split("url:")[1].strip()
-        raw_time = pieces[2].split("date:")[1].strip().split("(")[0]
-        freeze_time = parse(raw_time)
-    return url, freeze_time
-
-
-class UploadSampleView(LoginRequiredMixin, FormView):
-    template_name = "samples/upload_sample.html"
-    form_class = UploadSampleForm
-
-    def post(self, request, *args, **kwargs):
-        # We're just going to manually validate this.
-        form = self.form_class(request.POST, request.FILES)
-        if form.is_valid():
-            data = form.cleaned_data
-            frozen_page = smart_str(data["frozen_page"].read())
-            freeze_software = data["freeze_software"]
-            url, freeze_time = get_frozen_metadata(frozen_page, freeze_software)
-            Sample.objects.create(
-                frozen_page=frozen_page,
-                url=url,
-                freeze_time=freeze_time,
-                freeze_software=freeze_software,
-                notes=data["notes"],
-            )
-            return redirect("list_samples")
-        else:
-            return render(request, self.template_name, {"form": form})
-
-
-class SampleListView(LoginRequiredMixin, ListView):
+class SampleListView(LoginRequiredMixin, SingleTableView):
     model = Sample
     template_name = "samples/list_samples.html"
+    table_class = SampleTable
+
+    def get_queryset(self, *args, **kwargs):
+        try:
+            requested_label = Label.objects.get(
+                slug=self.request.GET.get("label", None)
+            )
+        except Label.DoesNotExist:
+            return Sample.objects.all()
+        filtered_qs = Sample.objects.filter(
+            labeledsample__labeledelement__label=requested_label
+        ).distinct()
+        return filtered_qs
 
 
 class SampleLabelView(LoginRequiredMixin, FormView):
@@ -64,7 +38,11 @@ class SampleLabelView(LoginRequiredMixin, FormView):
     form_class = SampleLabelForm
 
     def get_success_url(self):
-        return reverse("label", kwargs=dict(sample=f"{self.sample.original_sample.id}"))
+        # Returns to same page on submit
+        # return reverse("label", kwargs=dict(sample=f"{self.sample.original_sample.id}"))
+
+        # Returns to list view
+        return reverse("list_samples")
 
     def dispatch(self, request, *args, **kwargs):
         requested_sample_id = kwargs["sample"]
@@ -83,8 +61,13 @@ class SampleLabelView(LoginRequiredMixin, FormView):
     def get_context_data(self, **kwargs):
         # Call the base implementation first to get a context
         context = super().get_context_data(**kwargs)
+        labeled_elements = LabeledElement.objects.filter(labeled_sample=self.sample)
+        labels = ", ".join(
+            labeled_elements.distinct("label").values_list("label__slug", flat=True)
+        )
         context["sample"] = self.sample
-        context["labels"] = LabeledElement.objects.filter(labeled_sample=self.sample)
+        context["labeled_elements"] = labeled_elements
+        context["labels"] = labels
         return context
 
     def post(self, request, *args, **kwargs):
@@ -109,3 +92,42 @@ class SampleLabelView(LoginRequiredMixin, FormView):
             element.label = label
             element.save()
         return super().post(request, *args, **kwargs)
+
+
+class UploadSampleView(LoginRequiredMixin, FormView):
+    template_name = "samples/upload_sample.html"
+    form_class = UploadSampleForm
+
+    def get_frozen_metadata(self, page, freeze_software):
+        # Defaults
+        url = ""
+        freeze_time = datetime.now()
+        if freeze_software == "SinglePage":
+            soup = BeautifulSoup(page)
+            singlefile_comment = soup.html.contents[0]
+            pieces = singlefile_comment.strip().split("\n")
+            assert pieces[0].startswith("Page saved with SingleFile")
+            assert len(pieces) == 3
+            url = pieces[1].split("url:")[1].strip()
+            raw_time = pieces[2].split("date:")[1].strip().split("(")[0]
+            freeze_time = parse(raw_time)
+        return url, freeze_time
+
+    def post(self, request, *args, **kwargs):
+        # We're just going to manually validate this.
+        form = self.form_class(request.POST, request.FILES)
+        if form.is_valid():
+            data = form.cleaned_data
+            frozen_page = smart_str(data["frozen_page"].read())
+            freeze_software = data["freeze_software"]
+            url, freeze_time = self.get_frozen_metadata(frozen_page, freeze_software)
+            Sample.objects.create(
+                frozen_page=frozen_page,
+                url=url,
+                freeze_time=freeze_time,
+                freeze_software=freeze_software,
+                notes=data["notes"],
+            )
+            return redirect("list_samples")
+        else:
+            return render(request, self.template_name, {"form": form})

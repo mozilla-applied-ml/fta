@@ -11,7 +11,7 @@ django==3.0.10  # pyup: < 3.1  # https://www.djangoproject.com/
 django-environ==0.4.5  # https://github.com/joke2k/django-environ
 django-model-utils==4.0.0  # https://github.com/jazzband/django-model-utils
 django-crispy-forms==1.9.2  # https://github.com/django-crispy-forms/django-crispy-forms
-django-redis==4.12.1  # https://github.com/jazzband/django-redis
+django-tables2==2.3.3 # https://django-tables2.readthedocs.io/en/latest/
 # Django REST Framework
 djangorestframework==3.12.1  # https://github.com/encode/django-rest-framework
 django-cors-headers==3.5.0 # https://github.com/adamchainz/django-cors-headers

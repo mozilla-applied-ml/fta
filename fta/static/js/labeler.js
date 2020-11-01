@@ -111,7 +111,7 @@ function createOverlayForPickedElement(iframe, pickedElement, pickedElementsMap,
         }
     });
 
-    // Track edits to input field in data-fathom attribute
+    // Track edits to input field in data-fta_id attribute
     tagInput.addEventListener("input", function(e) {
         pickedElementsMap.get(pickedElement).tag = e.target.value;
     });
@@ -214,13 +214,6 @@ function createPickingUiForIframe({
         // Install handlers for picking new elements
         el.addEventListener("mouseover", hoverHandler);
         el.addEventListener("click", clickHandler);
-
-        //TODO: makes this work with an external labelData
-        // // Highlight existing tagged elements
-        // if (el.dataset.fathom) {
-        //     const overlay = createOverlayForPickedElement(iframe, el, pickedElementsMap);
-        //     pickedElementsMap.set(el, overlay);
-        // }
     }
 
     if (typeof toggleBtn !== "undefined") {

@@ -95,9 +95,10 @@ class SampleLabelView(LoginRequiredMixin, FormView):
         label_data_list = json.loads(request.POST.get("label-data", ""))
         for label_data in label_data_list:
             label, _ = Label.objects.get_or_create(slug=label_data["label"])
-            LabeledElement.objects.get_or_create(
+            element, _ = LabeledElement.objects.get_or_create(
                 labeled_sample=self.sample,
                 data_fta_id=label_data["fta_id"],
-                label=label,
             )
+            element.label = label
+            element.save()
         return super().post(request, *args, **kwargs)

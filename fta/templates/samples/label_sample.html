@@ -9,14 +9,20 @@
 {% block content %}
 <h2>{% trans "Label sample" %}</h2>
 <dl>
-  <dt>{% trans "id" %}</dt>
-  <dd>{{ sample.id }}</dd>
+  <dt>{% trans "Sample id" %}</dt>
+  <dd>{{ sample.original_sample.id }}</dd>
   <dt>{% trans "url" %}</dt>
   <dd>{{ sample.original_sample.url }}</dd>
   <dt>{% trans "Saved labels" %}</dt>
-  <dd>{% for l in labels %} {{ l.label }}{% if not forloop.last %},{% endif %} {% endfor %}</dd>
-  <dt>{% trans "Label editing" %}</dt>
-  <dd><input type="checkbox" id="toggle-picking"></dd>
+  <dd>
+    {% if labels %}
+      {% for l in labels %} {{ l.label }}{% if not forloop.last %},{% endif %} {% endfor %}
+    {% else %}
+      {% trans "None" %}
+    {% endif %}
+  </dd>
+  <dt>{% trans "Add new labels" %}</dt>
+  <dd><input type="checkbox" id="toggle-picking">  Check to add new label fields</dd>
 </dl>
 {% crispy form %}
 
@@ -33,17 +39,29 @@ document.addEventListener("DOMContentLoaded", function() {
     const submitBtn = document.getElementById("submit-labels");
     const startPicking = document.getElementById("toggle-picking").checked;
     let pickedElementsMap = new Map();
-    {% if labels %}
 
-    {% endif %}
+    function updatePickedElementsMap({iframe, pickedElementsMap}) {
+      let element = null;
+      {% for label in labels %}
+        element = iframe.contentDocument.querySelector("[data-fta_id='{{ label.data_fta_id }}']")
+        pickedElementsMap.set(element, {
+            overlay: null,
+            tag: "{{ label.label }}",
+        });
+      {% endfor %}
+
+    }
+
     const initializer = {
       iframe, toggleBtn, submitBtn, pickedElementsMap, startPicking
     };
     if (iframe.contentDocument !== null) {
-        createPickingUiForIframe(initializer);
+      updatePickedElementsMap({iframe, pickedElementsMap});
+      createPickingUiForIframe(initializer);
     } else {
         iframe.addEventListener("load", function() {
-            createPickingUiForIframe(initializer);
+          updatePickedElementsMap({iframe, pickedElementsMap});
+          createPickingUiForIframe(initializer);
         });
     }
 });

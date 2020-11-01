@@ -56,7 +56,7 @@ function updateOverlayPosition(iframe, overlay, tracked_element) {
     overlay.style.height = outerPosition.height;
 }
 
-function createOverlayForPickedElement(iframe, pickedElement, pickedElementsMap) {
+function createOverlayForPickedElement(iframe, pickedElement, pickedElementsMap, remover=true) {
     const taggedOverlay = createOverlayDiv({
         bgcolor: "red",
         transition: "none", // These should track scrolling without animations
@@ -77,19 +77,21 @@ function createOverlayForPickedElement(iframe, pickedElement, pickedElementsMap)
         style: "width: 100%; min-width: 10em;",
         value: "",
     });
-
-    const removeButton = $new("button", {
-        className: "remove-btn",
-        type: "button",
-        innerHTML: "Remove",
-    });
-    removeButton.addEventListener("click", function(e) {
-        taggedOverlay.parentElement.removeChild(taggedOverlay);
-        pickedElementsMap.delete(pickedElement);
-    });
-
     innerDiv.appendChild(tagInput);
-    innerDiv.appendChild(removeButton);
+
+    if (remover) {
+        const removeButton = $new("button", {
+            className: "remove-btn",
+            type: "button",
+            innerHTML: "Remove",
+        });
+        removeButton.addEventListener("click", function(e) {
+            taggedOverlay.parentElement.removeChild(taggedOverlay);
+            pickedElementsMap.delete(pickedElement);
+        });
+        innerDiv.appendChild(removeButton);
+    }
+
     taggedOverlay.appendChild(innerDiv);
 
     // Position overlay over picked element
@@ -163,6 +165,24 @@ function createPickingUiForIframe({
     // corresponding element in the iframe.
     let overlay = createOverlayDiv();
     document.body.appendChild(overlay);
+
+
+    // For all elements of pickedElementsMap, add overlay
+    // Overlay does not have a remove button. Tags can only be
+    // removed through back end.
+    pickedElementsMap.forEach(({overlay, tag}, element) => {
+        if (element.dataset.fta_id) {
+            let overlay = createOverlayForPickedElement(
+                iframe, element, pickedElementsMap, false
+            );
+            overlay.querySelector(".tag-input").value = tag;
+            pickedElementsMap.set(element, {
+                overlay: overlay,
+                tag: tag,
+            });
+        }
+    });
+
 
     // Position overlay div over the hovered element
     function hoverHandler(e) {

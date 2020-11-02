@@ -22,7 +22,7 @@ function createOverlayDiv(options) {
     options = options || {};
     return $new("div", {
         style: {
-            position: options.position || "absolute",
+            position: options.position || "fixed",
             opacity: options.opacity || 0.6,
             "background-color": options.bgcolor || "yellow",
             "pointer-events": "none",
@@ -218,6 +218,21 @@ function createPickingUiForIframe({
         el.addEventListener("mouseover", hoverHandler);
         el.addEventListener("click", clickHandler);
     }
+
+    // Update fixed overlays when parent document is scrolled
+    let ticking = false;
+    window.addEventListener("scroll", function(e) {
+        if (!ticking) {
+            window.requestAnimationFrame(function() {
+                for (const [element, {overlay, tag}] of pickedElementsMap) {
+                    updateOverlayPosition(iframe, overlay, element);
+                }
+                ticking = false;
+            });
+
+            ticking = true;
+        }
+    });
 
     if (typeof toggleBtn !== "undefined") {
         toggleBtn.addEventListener("click", function() {

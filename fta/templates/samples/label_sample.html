@@ -4,11 +4,30 @@
 
 {% block extrahead %}
 <meta http-equiv="Content-Security-Policy" content="child-src 'self'">
+<style type="text/css">
+.sample-info-table {
+    display: flex;
+    flex-flow: row wrap;
+    margin-bottom: 3px;
+}
+
+.sample-info-table > * {
+    margin-bottom: 3px;
+}
+
+.sample-info-table > dt {
+    flex: 0 0 250px;
+}
+
+.sample-info-table > dd {
+    flex: 1 1 75%;
+}
+</style>
 {% endblock extrahead %}
 
 {% block content %}
 <h2>{% trans "Label sample" %}</h2>
-<dl>
+<dl class="sample-info-table">
   <dt>{% trans "Sample id" %}</dt>
   <dd>{{ sample.original_sample.id }}</dd>
   <dt>{% trans "url" %}</dt>
@@ -26,7 +45,7 @@
 </dl>
 {% crispy form %}
 
-<iframe id="iframe" width="1024" height="768" srcdoc="{{ sample.modified_sample|escape }}"></iframe>
+<iframe id="iframe" width="1366" height="768" srcdoc="{{ sample.modified_sample|escape }}"></iframe>
 
 {% endblock content %}
 {% block extrajavascript %}

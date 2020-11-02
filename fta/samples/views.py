@@ -112,6 +112,19 @@ class UploadSampleView(LoginRequiredMixin, FormView):
                 url = pieces[1].split("url:")[1].strip()
                 raw_time = pieces[2].split("date:")[1].strip().split("(")[0]
                 freeze_time = parse(raw_time)
+            elif freeze_software == "freezedry":
+                soup = BeautifulSoup(page)
+                freezedry_link = soup.find("link", rel="original")
+                freezedry_datetime = soup.find(
+                    "meta",
+                    attrs={
+                        "http-equiv": "Memento-Datetime",
+                    },
+                )
+                if freezedry_link:
+                    url = freezedry_link["href"]
+                if freezedry_datetime:
+                    freeze_time = parse(freezedry_datetime["content"])
         except:  # noqa
             # It's okay if it fails. It just means freeze_software declaration
             # was probably wrong, so set to unknown.

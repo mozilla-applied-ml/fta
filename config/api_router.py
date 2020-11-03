@@ -1,7 +1,7 @@
 from django.conf import settings
 from rest_framework.routers import DefaultRouter, SimpleRouter
 
-from fta.samples.api.views import SampleViewSet
+from fta.samples.api.views import AddSampleViewSet, SampleViewSet
 
 if settings.DEBUG:
     router = DefaultRouter()
@@ -10,6 +10,7 @@ else:
 
 # Example how to register
 router.register("samples", SampleViewSet)
+router.register("add_sample", AddSampleViewSet, basename="add_sample")
 
 
 app_name = "api"

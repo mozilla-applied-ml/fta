@@ -94,42 +94,56 @@ class SampleLabelView(LoginRequiredMixin, FormView):
         return super().post(request, *args, **kwargs)
 
 
+def get_frozen_metadata(page, freeze_software):
+    # Defaults
+    url = ""
+    freeze_time = datetime.now()
+    try:
+        if freeze_software == "SinglePage":
+            soup = BeautifulSoup(page)
+            singlefile_comment = soup.html.contents[0]
+            pieces = singlefile_comment.strip().split("\n")
+            assert pieces[0].startswith("Page saved with SingleFile")
+            assert len(pieces) == 3
+            url = pieces[1].split("url:")[1].strip()
+            raw_time = pieces[2].split("date:")[1].strip().split("(")[0]
+            freeze_time = parse(raw_time)
+        elif freeze_software == "freezedry":
+            soup = BeautifulSoup(page)
+            freezedry_link = soup.find("link", rel="original")
+            freezedry_datetime = soup.find(
+                "meta",
+                attrs={
+                    "http-equiv": "Memento-Datetime",
+                },
+            )
+            if freezedry_link:
+                url = freezedry_link["href"]
+            if freezedry_datetime:
+                freeze_time = parse(freezedry_datetime["content"])
+    except:  # noqa
+        # It's okay if it fails. It just means freeze_software declaration
+        # was probably wrong, so set to unknown.
+        freeze_software = "Unknown"
+    return url, freeze_time, freeze_software
+
+
+def sample_from_required(frozen_page, freeze_software, notes):
+    url, freeze_time, freeze_software = get_frozen_metadata(
+        frozen_page, freeze_software
+    )
+    return Sample(
+        frozen_page=frozen_page,
+        url=url,
+        freeze_time=freeze_time,
+        freeze_software=freeze_software,
+        notes=notes,
+    )
+
+
 class UploadSampleView(LoginRequiredMixin, FormView):
     template_name = "samples/upload_sample.html"
     form_class = UploadSampleForm
-
-    def get_frozen_metadata(self, page, freeze_software):
-        # Defaults
-        url = ""
-        freeze_time = datetime.now()
-        try:
-            if freeze_software == "SinglePage":
-                soup = BeautifulSoup(page)
-                singlefile_comment = soup.html.contents[0]
-                pieces = singlefile_comment.strip().split("\n")
-                assert pieces[0].startswith("Page saved with SingleFile")
-                assert len(pieces) == 3
-                url = pieces[1].split("url:")[1].strip()
-                raw_time = pieces[2].split("date:")[1].strip().split("(")[0]
-                freeze_time = parse(raw_time)
-            elif freeze_software == "freezedry":
-                soup = BeautifulSoup(page)
-                freezedry_link = soup.find("link", rel="original")
-                freezedry_datetime = soup.find(
-                    "meta",
-                    attrs={
-                        "http-equiv": "Memento-Datetime",
-                    },
-                )
-                if freezedry_link:
-                    url = freezedry_link["href"]
-                if freezedry_datetime:
-                    freeze_time = parse(freezedry_datetime["content"])
-        except:  # noqa
-            # It's okay if it fails. It just means freeze_software declaration
-            # was probably wrong, so set to unknown.
-            freeze_software = "Unknown"
-        return url, freeze_time, freeze_software
 
     def post(self, request, *args, **kwargs):
         # We're just going to manually validate this.
@@ -138,16 +152,8 @@ class UploadSampleView(LoginRequiredMixin, FormView):
             data = form.cleaned_data
             frozen_page = smart_str(data["frozen_page"].read())
             freeze_software = data["freeze_software"]
-            url, freeze_time, freeze_software = self.get_frozen_metadata(
-                frozen_page, freeze_software
-            )
-            Sample.objects.create(
-                frozen_page=frozen_page,
-                url=url,
-                freeze_time=freeze_time,
-                freeze_software=freeze_software,
-                notes=data["notes"],
-            )
+            sample = sample_from_required(frozen_page, freeze_software, data["notes"])
+            sample.save()
             return redirect("list_samples")
         else:
             return render(request, self.template_name, {"form": form})

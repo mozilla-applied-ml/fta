@@ -32,28 +32,38 @@ function createOverlayDiv(options) {
     });
 }
 
-// Computes top/left/width/height position values corresponding to the displayed
-// position of `innerRect`, which is relative to `outerRect`, but in the root
-// document.
-function outerRelativePositionFromInnerRect(outerRect, innerRect) {
-    let result = {};
-    result.top = Math.max(outerRect.top, outerRect.top + innerRect.top) + "px";
-    result.left = Math.max(outerRect.left, outerRect.left + innerRect.left) + "px";
-    result.width = (innerRect.right - Math.max(0, innerRect.left)) + "px";
-    result.height = (innerRect.bottom - Math.max(0, innerRect.top)) + "px";
+// Computes top/left/width/height position values relative to outer viewport for
+// the `element` element, which may be nested several iframes deep.
+function outerRelativePositionForElement(element) {
+    const rect = element.getBoundingClientRect();
+    let result = {
+        top: rect.top,
+        left: rect.left,
+        width: rect.width,
+        height: rect.height
+    };
+
+    let current = null;
+    let next = element.ownerDocument.defaultView.frameElement;
+    do {
+        current = next;
+        next = current.ownerDocument.defaultView.frameElement;
+        const frameRect = current.getBoundingClientRect();
+        result.top = result.top + frameRect.top;
+        result.left = result.left + frameRect.left;
+    } while (next !== null);
+
     return result;
 }
 
 // Positions (absolutely) `overlay` (lives in outer page) over `tracked_element`
 // (lives in `iframe`).
 function updateOverlayPosition(iframe, overlay, tracked_element) {
-    const frameRect = iframe.getBoundingClientRect();
-    const rect = tracked_element.getBoundingClientRect();
-    const outerPosition = outerRelativePositionFromInnerRect(frameRect, rect);
-    overlay.style.top = outerPosition.top;
-    overlay.style.left = outerPosition.left;
-    overlay.style.width = outerPosition.width;
-    overlay.style.height = outerPosition.height;
+    const absolutePos = outerRelativePositionForElement(tracked_element);
+    overlay.style.top = absolutePos.top + "px";
+    overlay.style.left = absolutePos.left + "px";
+    overlay.style.width = absolutePos.width + "px";
+    overlay.style.height = absolutePos.height + "px";
 }
 
 function createOverlayForPickedElement(iframe, pickedElement, pickedElementsMap, remover=true) {
@@ -213,11 +223,19 @@ function createPickingUiForIframe({
         }
     }
 
-    for (const el of subdoc.body.querySelectorAll("*")) {
-        // Install handlers for picking new elements
-        el.addEventListener("mouseover", hoverHandler);
-        el.addEventListener("click", clickHandler);
+    function hookAllElements(body) {
+        for (const el of body.querySelectorAll("*")) {
+            if (el instanceof HTMLIFrameElement && el.contentDocument !== null) {
+                hookAllElements(el.contentDocument.body);
+            } else {
+                el.addEventListener("mouseover", hoverHandler);
+                el.addEventListener("click", clickHandler);
+            }
+        }
     }
+
+    // Install handlers for picking new elements, recursing into nested iframes
+    hookAllElements(subdoc.body);
 
     // Update fixed overlays when parent document is scrolled
     let ticking = false;

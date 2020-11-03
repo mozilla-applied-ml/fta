@@ -150,7 +150,7 @@ function handleFormSubmit(iframe, pickedElementsMap) {
         });
     }
     document.querySelector("input[name='label-data']").value = JSON.stringify(labelData);
-    document.querySelector("input[name='updated-sample']").value = iframe.contentDocument.documentElement.innerHTML;
+    document.querySelector("input[name='updated-sample']").value = iframe.contentDocument.documentElement.outerHTML;
 }
 
 // Create element picking and labeling UI for a loaded iframe

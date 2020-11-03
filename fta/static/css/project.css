@@ -23,3 +23,21 @@
 .asc {
   background: beige;
 }
+
+.sample-info-table {
+    display: flex;
+    flex-flow: row wrap;
+    margin-bottom: 3px;
+}
+
+.sample-info-table > * {
+    margin-bottom: 3px;
+}
+
+.sample-info-table > dt {
+    flex: 0 0 250px;
+}
+
+.sample-info-table > dd {
+    flex: 1 1 75%;
+}

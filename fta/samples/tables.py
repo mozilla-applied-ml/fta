@@ -33,6 +33,7 @@ class SampleTable(tables.Table):
             "freeze_time",
             "freeze_software",
             "page_size",
+            "notes",
         )
 
     def render_labels(self, value, record):

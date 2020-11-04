@@ -99,7 +99,7 @@ def get_frozen_metadata(page, freeze_software):
     url = ""
     freeze_time = datetime.now()
     try:
-        if freeze_software == "SinglePage":
+        if freeze_software == "SingleFile":
             soup = BeautifulSoup(page)
             singlefile_comment = soup.html.contents[0]
             pieces = singlefile_comment.strip().split("\n")

@@ -2,7 +2,7 @@ from django.db import models
 from django.dispatch import receiver
 
 # These are the freezers we know how to parse the meta data from
-SAMPLE_SOFTWARE_PARSERS = (("SinglePage", "SinglePage"), ("freezedry", "freezedry"))
+SAMPLE_SOFTWARE_PARSERS = (("SingleFile", "SingleFile"), ("freezedry", "freezedry"))
 
 
 # Create your models here.

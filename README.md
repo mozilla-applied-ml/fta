@@ -10,9 +10,11 @@ Fathom Training App - Utils to help with training fathom
 ### Setup
 
 Requires:
+
 * Postgres
 
-Setup instructions
+Setup instructions:
+
 * Make a conda or virtual environment - only python 3.8 has been tested - and activate.
 * `pip install -r requirements/local.txt`
 * `pre-commit install`
@@ -23,7 +25,6 @@ Setup instructions
 
 Server should now be running at [localhost](http://localhost:8000)
 
-
 ### Useful commands
 
 * To create a superuser account: `./manage.py createsuperuser`
@@ -33,6 +34,7 @@ Server should now be running at [localhost](http://localhost:8000)
 ### Linting and testing
 
 Linting should run on pre-commit, or with:
+
 * `flake8`
 * `black .`
 * `isort`
@@ -49,4 +51,64 @@ Running tests with py.test
 
 ## Deployment
 
-The following details how to deploy this application.
+
+
+#### To run production environment locally
+
+Install production requirements `pip install -r requirements/production.txt`
+
+Set environment variable `DJANGO_SETTINGS_MODULE` to `config.settings.production` to ensure that we're using production settings.
+
+Need a `.env` file with, at least, the following entries:
+  * DJANGO_SECRET_KEY
+  * DB_NAME
+  * DB_USERNAME
+  * DB_PASSWORD
+  * CLOUD_SQL_INSTANCE_ID
+  * DJANGO_SECURE_SSL_REDIRECT=False  (otherwise will have a hard time running locally)
+  * DJANGO_ALLOWED_HOSTS=localhost,
+
+Production settings will look for a cloudsql database. If you want to connect to the production database or a test cloud database you've setup, use [cloud sql proxy](https://cloud.google.com/sql/docs/mysql/sql-proxy). The settings are currently setup to expect the proxy port to be at 5454, so set cloud sql proxy appropriately (`./cloud_sql_proxy -instances="<instance id\>"=tcp:5454`)
+
+With all that setup, should be able to run `manage.py runserver` and check things are working as expected (ish).
+
+Tip: If you forgot to set DJANGO_SECURE_SSL_REDIRECT locally and ran the local server and got a message like "You're accessing the development server over HTTPS, but it only supports HTTP", make sure you clear browser cache before attempting to re-access having set the environment variable as the https redirect will be saved.
+
+#### Normal deployment via CI
+
+Deployment is generally handled on Travis.
+
+Need a `.env` file with, at least, the following entries:
+  * DJANGO_SECRET_KEY
+  * DB_NAME
+  * DB_USERNAME
+  * DB_PASSWORD
+  * CLOUD_SQL_INSTANCE_ID
+
+To find the `CLOUD_SQL_INSTANCE_ID` run `gcloud sql instances describe <instance_id> | grep connectionName` (where
+instance_id is from in https://console.cloud.google.com/sql/instances.)
+
+
+The `deploy/pre_deploy_script.py`:
+
+(a) Compiles a requirements.txt file (because the GAE docker file, looks for that first before copying all the app files over)
+
+(b) Builds the app.yaml
+
+(b) Builds a `.env` file with production variables from TravisCI encrypted variables.
+
+It then uses Travis' built in GAE deployment integration to effectively call `gcloud app deploy`.
+
+TODO - Currently migrations need to run manually and are not called by Travis.
+
+
+#### Manual deployment locally
+
+Run:
+
+* `deploy/pre_deploy_script.py`
+* `gcloud app deploy`
+
+If trying to debug, the `--verbosity=debug` flag is very useful.
+
+If db migrations are necessary, use the appropriate steps from "To run production environment locally" and run `./manage.py migrate`.

@@ -1,5 +1,12 @@
+# We build app.yaml dynamically
+app.yaml
+
+# Top-level requirements.txt (we build it dynamically)
+requirements.txt
+
 # Secrets
 .env
+.env.*
 
 ### Python template
 # Byte-compiled / optimized / DLL files

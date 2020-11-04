@@ -1,3 +1,6 @@
+# Base
+#-----------------
+
 pytz==2020.1  # https://github.com/stub42/pytz
 python-slugify==4.0.1  # https://github.com/un33k/python-slugify
 Pillow==8.0.0  # https://github.com/python-pillow/Pillow
@@ -6,12 +9,10 @@ beautifulsoup4==4.9.3  # https://www.crummy.com/software/BeautifulSoup/bs4/doc/
 python-dateutil==2.8.1  # https://github.com/dateutil/dateutil
 
 # Django
-# ------------------------------------------------------------------------------
 django==3.0.10  # pyup: < 3.1  # https://www.djangoproject.com/
 django-environ==0.4.5  # https://github.com/joke2k/django-environ
 django-model-utils==4.0.0  # https://github.com/jazzband/django-model-utils
 django-crispy-forms==1.9.2  # https://github.com/django-crispy-forms/django-crispy-forms
 django-tables2==2.3.3 # https://django-tables2.readthedocs.io/en/latest/
-# Django REST Framework
 djangorestframework==3.12.1  # https://github.com/encode/django-rest-framework
 django-cors-headers==3.5.0 # https://github.com/adamchainz/django-cors-headers

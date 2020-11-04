@@ -1,0 +1,12 @@
+# Don't upload unecessary . files.
+# We DO NEED `.env`
+.git/
+
+# Don't upload __pycache__ files
+__pycache__/
+
+# We have manaully made a requirements.txt file at top level
+requirements/
+
+# Don't need the deploy folder
+deploy/

@@ -23,7 +23,7 @@ def make_prod_requirements_txt():
 def make_app_yaml():
     env = environ.Env()
     env.read_env(str(ROOT_DIR / ".env"))
-    with open("template_app_yaml", "r") as f:
+    with open(ROOT_DIR / "deploy" / "template_app_yaml", "r") as f:
         app_yaml_template = f.read()
     template = Engine().from_string(app_yaml_template)
     context = Context(dict(instance_id=env.str("CLOUD_SQL_INSTANCE_ID")))
@@ -32,7 +32,7 @@ def make_app_yaml():
 
 
 def make_dot_env_file():
-    with open("template_env", "r") as f:
+    with open(ROOT_DIR / "deploy" / "template_env", "r") as f:
         env_template = f.read()
     template = Engine().from_string(env_template)
     context = Context(

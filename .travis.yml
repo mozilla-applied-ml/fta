@@ -1,32 +1,35 @@
 dist: xenial
-
 language: python
 python:
-  - "3.8"
-
+- '3.8'
 services:
-  - postgresql
-
+- postgresql
 jobs:
   include:
-    - name: "Linter"
-      before_script:
-        - pip install -r requirements/local.txt
-      script:
-        - "pre-commit run --all"
-
-    - name: "Django Test"
-      before_install:
-        - sudo apt-get update -qq
-        - sudo apt-get install -qq build-essential gettext python-dev zlib1g-dev libpq-dev xvfb
-        - sudo apt-get install -qq libjpeg8-dev libfreetype6-dev libwebp-dev
-        - sudo apt-get install -qq graphviz-dev python-setuptools python3-dev python-virtualenv python-pip
-        - sudo apt-get install -qq firefox automake libtool libreadline6 libreadline6-dev libreadline-dev
-        - sudo apt-get install -qq libsqlite3-dev libxml2 libxml2-dev libssl-dev libbz2-dev wget curl llvm
-      language: python
-      python:
-        - "3.8"
-      install:
-        - pip install -r requirements/local.txt
-      script:
-        - "pytest -v"
+  - name: Linter
+    before_script:
+    - pip install -r requirements/local.txt
+    script:
+    - pre-commit run --all
+  - name: Django Test
+    before_install:
+    - sudo apt-get update -qq
+    - sudo apt-get install -qq build-essential gettext python-dev zlib1g-dev libpq-dev
+      xvfb
+    - sudo apt-get install -qq libjpeg8-dev libfreetype6-dev libwebp-dev
+    - sudo apt-get install -qq graphviz-dev python-setuptools python3-dev python-virtualenv
+      python-pip
+    - sudo apt-get install -qq firefox automake libtool libreadline6 libreadline6-dev
+      libreadline-dev
+    - sudo apt-get install -qq libsqlite3-dev libxml2 libxml2-dev libssl-dev libbz2-dev
+      wget curl llvm
+    language: python
+    python:
+    - '3.8'
+    install:
+    - pip install -r requirements/local.txt
+    script:
+    - pytest -v
+env:
+  global:
+    secure: JbSe4ynOPktqtO9CZtcepVtJebGzm6K1kShrERHM8p9Ks8H82TzEBokZBWF+CWMNl0I9+DUkS5cT74S4FR5lRLDt56Y/eAm0rHYMDNDJ9xfWZzRtXY6NHL1x6STy57Hb0MTH5XXAbftlrbCn+x1BzbjaA07uOcWVV/F2OKinQd4nBPicJrZzdOT5vOYOxihxLTD8Lk5nNGBq6Hb271wkyVW+51IhbihaUt/yE+xI3aL0Yw0FhHsDxgOD9CTBX9OtvfbE8YIT4CDs1/1shdnsMDHnyA5eEkBN3p6jLr1iNTMFi5sFt4LZfvoyjd6Ytl7c4wyp50hbS8C+bvhxxzuvMiXA+Kql8115j2BlUJ7+oJ91vDD43fbU3tfGDdN+0cFg1dm6FK2frHM1lr4Nd67mB+tDcdZx2MhHrp5/bhqHmhJAdhloB/D+58lO0A4VPYnHLMi3wpuxdbJ6s/l5JaZsyoeW4zhJ96lqcFZOk0bfnFqEcZ5AYCoeMZ+QNzeSXtEzWeFxEjLRBnwYZU7KuuQbNwxF4yXoefj6vIMjHLaNrD+RvlBohXfH8Na7eBQ54+9zyt7hLnHEdfNmTX5UkzrLq5j/vHeaGvJtiQgjPuXK3W8aN21XNUCNUB/sjFZk0lczgg5ghitzO8Xn1EqP4olWgiJVSlWjPtHnWbs6Y/Vf8G8=

@@ -1,6 +1,7 @@
 # FTA
 
-[![Build Status](https://travis-ci.org/mozilla/fta.svg?branch=main)](https://travis-ci.org/mozilla/fta)
+[![Build
+Status](https://travis-ci.org/mozilla-applied-ml/fta.svg?branch=main)](https://travis-ci.org/mozilla-applied-ml/fta)
 
 
 Fathom Training App - Utils to help with training fathom
@@ -51,7 +52,7 @@ Running tests with py.test
 
 ## Deployment
 
-
+Setup a google storage bucket and set acl for `gsutil acl -r ch -u AllUsers:R gs://BUCKET/FOLDER`
 
 #### To run production environment locally
 
@@ -67,6 +68,7 @@ Need a `.env` file with, at least, the following entries:
   * CLOUD_SQL_INSTANCE_ID
   * DJANGO_SECURE_SSL_REDIRECT=False  (otherwise will have a hard time running locally)
   * DJANGO_ALLOWED_HOSTS=localhost,
+  * DJANGO_GCP_STORAGE_BUCKET_NAME
 
 Production settings will look for a cloudsql database. If you want to connect to the production database or a test cloud database you've setup, use [cloud sql proxy](https://cloud.google.com/sql/docs/mysql/sql-proxy). The settings are currently setup to expect the proxy port to be at 5454, so set cloud sql proxy appropriately (`./cloud_sql_proxy -instances="<instance id\>"=tcp:5454`)
 
@@ -84,6 +86,7 @@ Need a `.env` file with, at least, the following entries:
   * DB_USERNAME
   * DB_PASSWORD
   * CLOUD_SQL_INSTANCE_ID
+  * DJANGO_GCP_STORAGE_BUCKET_NAME
 
 To find the `CLOUD_SQL_INSTANCE_ID` run `gcloud sql instances describe <instance_id> | grep connectionName` (where
 instance_id is from in https://console.cloud.google.com/sql/instances.)
@@ -99,16 +102,26 @@ The `deploy/pre_deploy_script.py`:
 
 It then uses Travis' built in GAE deployment integration to effectively call `gcloud app deploy`.
 
-TODO - Currently migrations need to run manually and are not called by Travis.
-
 
 #### Manual deployment locally
 
 Run:
 
-* `deploy/pre_deploy_script.py`
-* `gcloud app deploy`
+* `python deploy/pre_deploy_script.py`
+* `gcloud app deploy
+
+If new static files to update:
+
+* `./manage.py collectstatic`
+* `gsutil rsync -r staticfiles gs://BUCKET/FOLDER`
 
 If trying to debug, the `--verbosity=debug` flag is very useful.
 
 If db migrations are necessary, use the appropriate steps from "To run production environment locally" and run `./manage.py migrate`.
+
+
+#### Sources:
+
+Following articles were useful:
+
+* https://codeburst.io/beginners-guide-to-deploying-a-django-postgresql-project-on-google-cloud-s-flexible-app-engine-e3357b601b91

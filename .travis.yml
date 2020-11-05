@@ -23,14 +23,14 @@ script:
 - pytest -v
 before_deploy:
 - python deploy/pre_deploy_script.py
+- ls -hal
 deploy:
   provider: gae
   keyfile: YOUR SERVICE ACCOUNT JSON FILE
   project: YOUR PROJECT ID
+  skip_cleanup: true
   on:
-    branches:
-      only:
-      - main
+    branch: main
 env:
   global:
     secure: S85sFMts8pdpgmKC29iOrTD/DFZ5aD3kzl+xwSdg5kMZdcJeZ1VY1vDM34czQRHtE0JYxLf6jbUV9zi4IMXMV1TOCHWScVOxhZ0H0l/hgoELDcyUQWT5vdq2grJULzrWfcKAoZQJXkJNR338kCfM5J+24Z4nZOZgEJr7/sI/+GgDbA292C19LPXVnqX68pJ+oc5EHUCzOiZTVGJ2d4E3jGdYe/sXbIIEjAEzb/UVj9lwX3FibKu1hrIy92Ofz0/DgbTSOgwKZvXpyVFZQMXuujsacvavk/5WdtYZDb5/Sre0YFVtt+NOGKiqi7aLIiRqOeYtoos4ob9Bgd8zgT9TIkedNRdeAW5DHOxjKHya3Ys7GL1um7IrUfc71fXfCB/O0V2TwsCZCn+Ekh77rnikiqS+mqKCqv2k3qqvIkju4mLrNfekxErahUXBb0RD8sriFV7Z4KRfFpIRi3IyloZ0n15fJ3BymGpZGtTVbphwCKBewiqmYhebCXMYikz4SbHqTEcwloTZ2mv0kfQUJ9XKp9yB2cgYiflcI5GtnehR6EdxV2oIJdQmeYGorPT+31sw53lCbUM4qldFExZNopnJnwssXCtemkaxOZgN9KPgTgEIFKgUEcDD8BD5wDeu6y85KsxnrA+VtpPbvLxF3MhDaXktBpburpx0IWSZ0Q6KIhc=

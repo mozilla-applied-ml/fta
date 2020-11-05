@@ -11,6 +11,6 @@
   <p>{% blocktrans %}You must be <b><a href="{{ login_url }}">logged in</a></b> to use this app.{% endblocktrans %}</p>
 {% endif %}
 
-<p>Deployed, with love, by Travis.</p>
+<p>Hello user "{{ request.user.username }}"</p>
 
 {% endblock content %}

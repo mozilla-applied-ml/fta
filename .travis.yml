@@ -10,8 +10,8 @@ before_install:
 install:
 - pip install -r requirements/local.txt
 script:
-- pytest -v
 - pre-commit run --all
+- pytest -v
 before_deploy:
 - python deploy/pre_deploy_script.py
 deploy:

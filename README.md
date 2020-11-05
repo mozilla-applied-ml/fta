@@ -120,8 +120,16 @@ If trying to debug, the `--verbosity=debug` flag is very useful.
 If db migrations are necessary, use the appropriate steps from "To run production environment locally" and run `./manage.py migrate`.
 
 
-#### Sources:
+#### Notes
+
+On Google, needed a service account with:
+
+* App Engine Admin
+* Cloud Build Service Account
+* Storage Adming
 
 Following articles were useful:
 
 * https://codeburst.io/beginners-guide-to-deploying-a-django-postgresql-project-on-google-cloud-s-flexible-app-engine-e3357b601b91
+* https://cloud.google.com/solutions/continuous-delivery-with-travis-ci#create_a_service_account
+* https://medium.com/coinmonks/continuous-integration-with-google-application-engine-and-travis-d822b751fb47

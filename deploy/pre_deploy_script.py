@@ -1,4 +1,4 @@
-import os
+from os import environ as os_env
 from pathlib import Path
 
 import environ
@@ -23,7 +23,7 @@ def make_prod_requirements_txt():
 def make_app_yaml():
     env = environ.Env()
     env.read_env(str(ROOT_DIR / ".env"))
-    with open(ROOT_DIR / "app.yaml.template", "r") as f:
+    with open("template_app_yaml", "r") as f:
         app_yaml_template = f.read()
     template = Engine().from_string(app_yaml_template)
     context = Context(dict(instance_id=env.str("CLOUD_SQL_INSTANCE_ID")))
@@ -32,8 +32,21 @@ def make_app_yaml():
 
 
 def make_dot_env_file():
-    print("IN DOT ENV")
-    print(os.environ.get("MY_SECRET_ENV", "MY_SECRET_ENV Not Available"))
+    with open("template_env", "r") as f:
+        env_template = f.read()
+    template = Engine().from_string(env_template)
+    context = Context(
+        dict(
+            DJANGO_SECRET_KEY=os_env.get("DJANGO_SECRET_KEY"),
+            DB_NAME=os_env.get("DB_NAME"),
+            DB_USERNAME=os_env.get("DB_USERNAME"),
+            DB_PASSWORD=os_env.get("DB_PASSWORD"),
+            CLOUD_SQL_INSTANCE_ID=os_env.get("CLOUD_SQL_INSTANCE_ID"),
+            DJANGO_GCP_STORAGE_BUCKET_NAME=os_env.get("DJANGO_GCP_STORAGE_BUCKET_NAME"),
+        )
+    )
+    with open(ROOT_DIR / ".env", "w") as f:
+        f.write(template.render(context))
 
 
 if __name__ == "__main__":

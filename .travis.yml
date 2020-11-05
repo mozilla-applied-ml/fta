@@ -32,6 +32,10 @@ jobs:
     - pytest -v
 before_deploy:
   - python deploy/pre_deploy_script.py
+deploy:
+  provider: gae
+  keyfile: "YOUR SERVICE ACCOUNT JSON FILE"
+  project: "YOUR PROJECT ID"
 env:
   global:
     secure: JbSe4ynOPktqtO9CZtcepVtJebGzm6K1kShrERHM8p9Ks8H82TzEBokZBWF+CWMNl0I9+DUkS5cT74S4FR5lRLDt56Y/eAm0rHYMDNDJ9xfWZzRtXY6NHL1x6STy57Hb0MTH5XXAbftlrbCn+x1BzbjaA07uOcWVV/F2OKinQd4nBPicJrZzdOT5vOYOxihxLTD8Lk5nNGBq6Hb271wkyVW+51IhbihaUt/yE+xI3aL0Yw0FhHsDxgOD9CTBX9OtvfbE8YIT4CDs1/1shdnsMDHnyA5eEkBN3p6jLr1iNTMFi5sFt4LZfvoyjd6Ytl7c4wyp50hbS8C+bvhxxzuvMiXA+Kql8115j2BlUJ7+oJ91vDD43fbU3tfGDdN+0cFg1dm6FK2frHM1lr4Nd67mB+tDcdZx2MhHrp5/bhqHmhJAdhloB/D+58lO0A4VPYnHLMi3wpuxdbJ6s/l5JaZsyoeW4zhJ96lqcFZOk0bfnFqEcZ5AYCoeMZ+QNzeSXtEzWeFxEjLRBnwYZU7KuuQbNwxF4yXoefj6vIMjHLaNrD+RvlBohXfH8Na7eBQ54+9zyt7hLnHEdfNmTX5UkzrLq5j/vHeaGvJtiQgjPuXK3W8aN21XNUCNUB/sjFZk0lczgg5ghitzO8Xn1EqP4olWgiJVSlWjPtHnWbs6Y/Vf8G8=

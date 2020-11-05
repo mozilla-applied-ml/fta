@@ -37,6 +37,6 @@ def make_dot_env_file():
 
 
 if __name__ == "__main__":
+    make_dot_env_file()
     make_prod_requirements_txt()
     make_app_yaml()
-    make_dot_env_file()

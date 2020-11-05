@@ -1,41 +1,36 @@
+os: linux
 dist: xenial
 language: python
 python:
 - '3.8'
 services:
 - postgresql
-jobs:
-  include:
-  - name: Linter
-    before_script:
-    - pip install -r requirements/local.txt
-    script:
-    - pre-commit run --all
-  - name: Django Test
-    before_install:
-    - sudo apt-get update -qq
-    - sudo apt-get install -qq build-essential gettext python-dev zlib1g-dev libpq-dev
-      xvfb
-    - sudo apt-get install -qq libjpeg8-dev libfreetype6-dev libwebp-dev
-    - sudo apt-get install -qq graphviz-dev python-setuptools python3-dev python-virtualenv
-      python-pip
-    - sudo apt-get install -qq firefox automake libtool libreadline6 libreadline6-dev
-      libreadline-dev
-    - sudo apt-get install -qq libsqlite3-dev libxml2 libxml2-dev libssl-dev libbz2-dev
-      wget curl llvm
-    language: python
-    python:
-    - '3.8'
-    install:
-    - pip install -r requirements/local.txt
-    script:
-    - pytest -v
+before_install:
+- sudo apt-get update -qq
+- sudo apt-get install -qq build-essential gettext python-dev zlib1g-dev libpq-dev
+  xvfb
+- sudo apt-get install -qq libjpeg8-dev libfreetype6-dev libwebp-dev
+- sudo apt-get install -qq graphviz-dev python-setuptools python3-dev python-virtualenv
+  python-pip
+- sudo apt-get install -qq firefox automake libtool libreadline6 libreadline6-dev
+  libreadline-dev
+- sudo apt-get install -qq libsqlite3-dev libxml2 libxml2-dev libssl-dev libbz2-dev
+  wget curl llvm
+install:
+- pip install -r requirements/local.txt
+script:
+- pre-commit run --all
+- pytest -v
 before_deploy:
-  - python deploy/pre_deploy_script.py
+- python deploy/pre_deploy_script.py
 deploy:
   provider: gae
-  keyfile: "YOUR SERVICE ACCOUNT JSON FILE"
-  project: "YOUR PROJECT ID"
+  keyfile: YOUR SERVICE ACCOUNT JSON FILE
+  project: YOUR PROJECT ID
+  on:
+    branches:
+      only:
+      - main
 env:
   global:
-    secure: JbSe4ynOPktqtO9CZtcepVtJebGzm6K1kShrERHM8p9Ks8H82TzEBokZBWF+CWMNl0I9+DUkS5cT74S4FR5lRLDt56Y/eAm0rHYMDNDJ9xfWZzRtXY6NHL1x6STy57Hb0MTH5XXAbftlrbCn+x1BzbjaA07uOcWVV/F2OKinQd4nBPicJrZzdOT5vOYOxihxLTD8Lk5nNGBq6Hb271wkyVW+51IhbihaUt/yE+xI3aL0Yw0FhHsDxgOD9CTBX9OtvfbE8YIT4CDs1/1shdnsMDHnyA5eEkBN3p6jLr1iNTMFi5sFt4LZfvoyjd6Ytl7c4wyp50hbS8C+bvhxxzuvMiXA+Kql8115j2BlUJ7+oJ91vDD43fbU3tfGDdN+0cFg1dm6FK2frHM1lr4Nd67mB+tDcdZx2MhHrp5/bhqHmhJAdhloB/D+58lO0A4VPYnHLMi3wpuxdbJ6s/l5JaZsyoeW4zhJ96lqcFZOk0bfnFqEcZ5AYCoeMZ+QNzeSXtEzWeFxEjLRBnwYZU7KuuQbNwxF4yXoefj6vIMjHLaNrD+RvlBohXfH8Na7eBQ54+9zyt7hLnHEdfNmTX5UkzrLq5j/vHeaGvJtiQgjPuXK3W8aN21XNUCNUB/sjFZk0lczgg5ghitzO8Xn1EqP4olWgiJVSlWjPtHnWbs6Y/Vf8G8=
+    secure: S85sFMts8pdpgmKC29iOrTD/DFZ5aD3kzl+xwSdg5kMZdcJeZ1VY1vDM34czQRHtE0JYxLf6jbUV9zi4IMXMV1TOCHWScVOxhZ0H0l/hgoELDcyUQWT5vdq2grJULzrWfcKAoZQJXkJNR338kCfM5J+24Z4nZOZgEJr7/sI/+GgDbA292C19LPXVnqX68pJ+oc5EHUCzOiZTVGJ2d4E3jGdYe/sXbIIEjAEzb/UVj9lwX3FibKu1hrIy92Ofz0/DgbTSOgwKZvXpyVFZQMXuujsacvavk/5WdtYZDb5/Sre0YFVtt+NOGKiqi7aLIiRqOeYtoos4ob9Bgd8zgT9TIkedNRdeAW5DHOxjKHya3Ys7GL1um7IrUfc71fXfCB/O0V2TwsCZCn+Ekh77rnikiqS+mqKCqv2k3qqvIkju4mLrNfekxErahUXBb0RD8sriFV7Z4KRfFpIRi3IyloZ0n15fJ3BymGpZGtTVbphwCKBewiqmYhebCXMYikz4SbHqTEcwloTZ2mv0kfQUJ9XKp9yB2cgYiflcI5GtnehR6EdxV2oIJdQmeYGorPT+31sw53lCbUM4qldFExZNopnJnwssXCtemkaxOZgN9KPgTgEIFKgUEcDD8BD5wDeu6y85KsxnrA+VtpPbvLxF3MhDaXktBpburpx0IWSZ0Q6KIhc=

@@ -19,7 +19,7 @@ before_deploy:
 deploy:
   provider: gae
   keyfile: gae-keyfile.json
-  project: "$PROJECT_ID"
+  project: $PROJECT_ID
   skip_cleanup: true
   on:
     branch: main

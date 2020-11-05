@@ -1,3 +1,4 @@
+import os
 from pathlib import Path
 
 import environ
@@ -30,6 +31,12 @@ def make_app_yaml():
         f.write(template.render(context))
 
 
+def make_dot_env_file():
+    print("IN DOT ENV")
+    print(os.environ.get("MY_SECRET_ENV", "MY_SECRET_ENV Not Available"))
+
+
 if __name__ == "__main__":
     make_prod_requirements_txt()
     make_app_yaml()
+    make_dot_env_file()

@@ -18,8 +18,8 @@ before_deploy:
 - python deploy/pre_deploy_script.py
 deploy:
   provider: gae
-  keyfile: gae-keyfile.json
-  project: $PROJECT_ID
+  keyfile: './gae-keyfile.json'
+  project: srg-team-sandbox
   skip_cleanup: true
   on:
     branch: main

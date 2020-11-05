@@ -19,7 +19,7 @@ before_deploy:
 deploy:
   provider: gae
   keyfile: "./gae-keyfile.json"
-  project: maml-team-sandbox
+  project: srg-team-sandbox
   skip_cleanup: true
   on:
     branch: main

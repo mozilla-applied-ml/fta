@@ -5,12 +5,14 @@
 <h1>{% blocktrans %}Fathom Training App{% endblocktrans %}</h1>
 
 {% if request.user.is_authenticated %}
+<h3>{% trans "Hello" %} {{ request.user.username }}.</h3>
+<p>{% blocktrans %}We hope you appreciate the beauty of this app we've made for you.{% endblocktrans %}</p>
+<p>{% blocktrans %}If not, you can .... file an issue <a href="https://github.com/mozilla-applied-ml/fta">here</a>.{% endblocktrans %}</p>
 
 {% else %}
   {% url 'login' as login_url %}
   <p>{% blocktrans %}You must be <b><a href="{{ login_url }}">logged in</a></b> to use this app.{% endblocktrans %}</p>
 {% endif %}
 
-<p>Hello user "{{ request.user.username }}"</p>
 
 {% endblock content %}

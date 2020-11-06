@@ -102,6 +102,10 @@ The `deploy/pre_deploy_script.py`:
 
 It then uses Travis' built in GAE deployment integration to effectively call `gcloud app deploy`.
 
+If there are db migrations necessary, then these must be manually.
+
+If db migrations are necessary, use the appropriate steps from "To run production environment locally" and run `./manage.py migrate`.
+
 
 #### Manual deployment locally
 

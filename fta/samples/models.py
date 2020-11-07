@@ -64,9 +64,14 @@ def prevent_updating_of_frozen_page_and_data(sender, instance, **kwargs):
             or (obj.url != instance.url)
             or (obj.freeze_time != instance.freeze_time)
             or (obj.freeze_software != instance.freeze_software)
+            or (obj.page_width != instance.page_width)
+            or (obj.page_height != instance.page_height)
         ):
             raise models.ProtectedError(
-                "Only notes can be changed after initial creation."
+                msg="Only notes can be changed after initial creation.",
+                protected_objects=[
+                    instance,
+                ],
             )
 
 

@@ -98,16 +98,21 @@ def get_frozen_metadata(page, freeze_software):
     # Defaults
     url = ""
     freeze_time = datetime.now()
+    page_width = None
+    page_height = None
     try:
         if freeze_software == "SingleFile":
             soup = BeautifulSoup(page)
             singlefile_comment = soup.html.contents[0]
             pieces = singlefile_comment.strip().split("\n")
             assert pieces[0].startswith("Page saved with SingleFile")
-            assert len(pieces) == 3
+            assert len(pieces) == 3 or len(pieces) == 5
             url = pieces[1].split("url:")[1].strip()
             raw_time = pieces[2].split("date:")[1].strip().split("(")[0]
             freeze_time = parse(raw_time)
+            if len(pieces) == 5:
+                page_width = int(pieces[3].split("window width:")[1])
+                page_height = int(pieces[4].split("window height:")[1])
         elif freeze_software == "freezedry":
             soup = BeautifulSoup(page)
             freezedry_link = soup.find("link", rel="original")
@@ -125,11 +130,11 @@ def get_frozen_metadata(page, freeze_software):
         # It's okay if it fails. It just means freeze_software declaration
         # was probably wrong, so set to unknown.
         freeze_software = "Unknown"
-    return url, freeze_time, freeze_software
+    return url, freeze_time, freeze_software, page_width, page_height
 
 
 def sample_from_required(frozen_page, freeze_software, notes):
-    url, freeze_time, freeze_software = get_frozen_metadata(
+    url, freeze_time, freeze_software, page_width, page_height = get_frozen_metadata(
         frozen_page, freeze_software
     )
     return Sample(
@@ -138,6 +143,8 @@ def sample_from_required(frozen_page, freeze_software, notes):
         freeze_time=freeze_time,
         freeze_software=freeze_software,
         notes=notes,
+        page_width=page_width,
+        page_height=page_height,
     )
 
 

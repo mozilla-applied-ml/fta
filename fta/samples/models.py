@@ -40,6 +40,12 @@ class Sample(models.Model):
         blank=True,
         null=True,
     )
+    page_width = models.IntegerField(
+        verbose_name="Page width in pixels", blank=True, null=True
+    )
+    page_height = models.IntegerField(
+        verbose_name="Page height in pixels", blank=True, null=True
+    )
 
     def save(self, *args, **kwargs):
         self.page_size = len(self.frozen_page.encode("utf-8"))

@@ -1,7 +1,5 @@
 # FTA
 
-Test
-
 [![Build
 Status](https://travis-ci.org/mozilla-applied-ml/fta.svg?branch=main)](https://travis-ci.org/mozilla-applied-ml/fta)
 
@@ -114,7 +112,7 @@ If db migrations are necessary, use the appropriate steps from "To run productio
 Run:
 
 * `python deploy/pre_deploy_script.py`
-* `gcloud app deploy
+* `gcloud app deploy`
 
 If new static files to update:
 

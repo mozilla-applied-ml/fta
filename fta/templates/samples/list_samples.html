@@ -4,11 +4,21 @@
 
 {% block content %}
 <h2>{% blocktrans %}Samples{% endblocktrans %}</h2>
+<div class="alert alert-danger" role="alert">
+  Samples may include pornographic or other offensive content. You are <b>not</b> obliged to review offensive content. Please use your discretion and discuss with team.
+</div>
 {% if request.GET.label %}
-<p>Table is filtered to samples with label "{{ request.GET.label }}". <a href="{% url 'list_samples' %}">Clear filter</a></p>
+<p>
+  {% if request.GET.label == '-' %}
+    Table is filtered to samples with no label.
+  {% else %}
+    Table is filtered to samples with label "{{ request.GET.label }}".
+  {% endif %}
+  <a href="{% url 'list_samples' %}">Clear filter</a>
+</p>
 {% else %}
-<p>Click a label to filter table by existing labels.</p>
+<p>Click a label to filter table by existing labels. Selecting "-" will filter to samples with no labels.</p>
 {% endif %}
-<p>You can click on a table heading to sort.</p>
+<p>You can click on a table heading to sort. Sorting display is kinda janky, header colors will change for ascending / descending sort.</p>
 {% render_table table %}
 {% endblock content %}

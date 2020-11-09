@@ -1,4 +1,5 @@
 import django_tables2 as tables
+from django.template.defaultfilters import truncatechars
 from django.utils.html import format_html
 from django_tables2.utils import A
 
@@ -37,13 +38,19 @@ class SampleTable(tables.Table):
         )
 
     def render_labels(self, value, record):
+        default = format_html('<a href="?label=-">-</a>')
         if hasattr(record, "labeledsample"):
             labeled_elements = record.labeledsample.labeledelement_set.all()
             labels = labeled_elements.values_list("label__slug", flat=True).distinct()
-            label_links = [f'<a href="?label={label}">{label}</a>' for label in labels]
-            return format_html(", ".join(label_links))
-        else:
-            return ""
+            if labels:
+                label_links = [
+                    f'<a href="?label={label}">{label}</a>' for label in labels
+                ]
+                return format_html(", ".join(label_links))
+        return default
 
     def render_page_size(self, value, record):
         return humansize(value)
+
+    def render_url(self, value, record):
+        return f"{truncatechars(value, 80)}"

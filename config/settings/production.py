@@ -74,16 +74,21 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
 INSTALLED_APPS += ["storages"]  # noqa F405
 GS_BUCKET_NAME = env("DJANGO_GCP_STORAGE_BUCKET_NAME")
 GS_DEFAULT_ACL = "publicRead"
+GS_CUSTOM_ENDPOINT = f"https://{GS_BUCKET_NAME}.storage.googleapis.com"
+
+CORS_ALLOWED_ORIGINS = [
+    GS_CUSTOM_ENDPOINT,
+]
 
 # STATIC
 # ------------------------
 STATICFILES_STORAGE = "fta.utils.storages.StaticRootGoogleCloudStorage"
-STATIC_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/static/"
+STATIC_URL = f"https://{GS_BUCKET_NAME}.storage.googleapis.com/{GS_BUCKET_NAME}/static/"
 
 # MEDIA
 # ------------------------------------------------------------------------------
 DEFAULT_FILE_STORAGE = "fta.utils.storages.MediaRootGoogleCloudStorage"
-MEDIA_URL = f"https://storage.googleapis.com/{GS_BUCKET_NAME}/media/"
+MEDIA_URL = f"https://{GS_BUCKET_NAME}.storage.googleapis.com/{GS_BUCKET_NAME}/media/"
 
 # EMAIL
 #

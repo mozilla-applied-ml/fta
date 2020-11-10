@@ -3,6 +3,14 @@ env: flex # for Google Cloud Flexible App Engine
 entrypoint: gunicorn -b :$PORT config.wsgi # specific to a GUnicorn HTTP server deployment
 service: fta
 
+manual_scaling:
+  instances: 1
+
+resources:
+  cpu: 4
+  memory_gb: 8
+  disk_size_gb: 30
+
 beta_settings:
   cloud_sql_instances: {{instance_id}}
 

@@ -114,6 +114,10 @@ Run:
 * `python deploy/pre_deploy_script.py`
 * `gcloud app deploy`
 
+**warning** the deploy script expects the .env variables to be environment variables, that are then copied into a .env.
+Because that's how things work on travis. If you have an existing .env it will be overridden. So either comment out the
+`make_dot_env` function in the deploy script or make sure the right variables are environment variables.
+
 If new static files to update:
 
 * `./manage.py collectstatic`

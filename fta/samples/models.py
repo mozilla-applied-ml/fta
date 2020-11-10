@@ -5,10 +5,23 @@ from django.dispatch import receiver
 SAMPLE_SOFTWARE_PARSERS = (("SingleFile", "SingleFile"), ("freezedry", "freezedry"))
 
 
+class SampleManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .select_related("labeled_sample")
+            .prefetch_related("labeled_sample__labeled_elements")
+            .annotate(nlabels=models.Count("labeled_sample__labeled_elements"))
+        )
+
+
 # Create your models here.
 class Sample(models.Model):
     # We are using binary fields for simplicity for the time being.
     # May want to change to external storage later.
+
+    objects = SampleManager()
 
     # Required
     frozen_page = models.TextField(
@@ -73,6 +86,7 @@ def prevent_updating_of_frozen_page_and_data(sender, instance, **kwargs):
 class LabeledSample(models.Model):
     original_sample = models.OneToOneField(
         Sample,
+        related_name="labeled_sample",
         on_delete=models.CASCADE,
         blank=False,
         null=False,
@@ -106,6 +120,7 @@ class Label(models.Model):
 class LabeledElement(models.Model):
     labeled_sample = models.ForeignKey(
         to=LabeledSample,
+        related_name="labeled_elements",
         on_delete=models.CASCADE,
         blank=False,
         null=False,
@@ -128,3 +143,6 @@ class LabeledElement(models.Model):
     class Meta:
         # Can't have more than one label for a field
         unique_together = ["data_fta_id", "labeled_sample"]
+
+    def __str__(self):
+        return f"{self.labeled_sample.pk} - {self.label} - {self.data_fta_id}"

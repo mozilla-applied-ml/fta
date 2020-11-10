@@ -16,13 +16,37 @@
   border-color: #eed3d7;
 }
 
-.desc {
-  background: aliceblue;
+.orderable.asc, .orderable.desc {
+	display: inline-block;
+	position: relative;
+	border: none;
 }
 
-.asc {
-  background: beige;
+.orderable.desc:after, .orderable.asc:after {
+	content: '';
+	display: block;
+	position: absolute;
+	width: 0;
+	height: 0;
+	left: 100%;
 }
+
+.orderable.desc:after {
+	top: 50%;
+	border-top: 5px solid black;
+	border-right: 5px solid transparent;
+	border-bottom: 5px solid transparent;
+	border-left: 5px solid transparent;
+}
+
+.orderable.asc:after {
+	bottom: 50%;
+	border-bottom: 5px solid black;
+	border-top: 5px solid transparent;
+	border-left: 5px solid transparent;
+	border-right: 5px solid transparent;
+}
+
 
 .sample-info-table {
     display: flex;

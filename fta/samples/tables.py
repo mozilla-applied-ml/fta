@@ -21,7 +21,7 @@ class SampleTable(tables.Table):
     edit = tables.LinkColumn(
         "label", text="Edit Labels", args=[A("pk")], orderable=False
     )
-    labels = tables.Column(accessor="pk", orderable=False)
+    labels = tables.Column(accessor="pk", orderable=True)
 
     class Meta:
         model = Sample
@@ -39,8 +39,8 @@ class SampleTable(tables.Table):
 
     def render_labels(self, value, record):
         default = format_html('<a href="?label=-">-</a>')
-        if hasattr(record, "labeledsample"):
-            labeled_elements = record.labeledsample.labeledelement_set.all()
+        if hasattr(record, "labeled_sample"):
+            labeled_elements = record.labeled_sample.labeled_elements.all()
             labels = labeled_elements.values_list("label__slug", flat=True).distinct()
             if labels:
                 label_links = [
@@ -48,6 +48,10 @@ class SampleTable(tables.Table):
                 ]
                 return format_html(", ".join(label_links))
         return default
+
+    def order_labels(self, queryset, is_descending):
+        queryset = queryset.order_by(("-" if is_descending else "") + "nlabels")
+        return (queryset, True)
 
     def render_page_size(self, value, record):
         return humansize(value)

@@ -43,6 +43,7 @@ def make_dot_env_file():
             DB_PASSWORD=os_env.get("DB_PASSWORD"),
             CLOUD_SQL_INSTANCE_ID=os_env.get("CLOUD_SQL_INSTANCE_ID"),
             DJANGO_GCP_STORAGE_BUCKET_NAME=os_env.get("DJANGO_GCP_STORAGE_BUCKET_NAME"),
+            DJANGO_GCP_MEDIA_BUCKET_NAME=os_env.get("DJANGO_GCP_MEDIA_BUCKET_NAME"),
         )
     )
     with open(ROOT_DIR / ".env", "w") as f:

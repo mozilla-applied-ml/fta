@@ -83,7 +83,20 @@ def prevent_updating_of_frozen_page_and_data(sender, instance, **kwargs):
             )
 
 
+class LabeledSampleManager(models.Manager):
+    def get_queryset(self):
+        return (
+            super()
+            .get_queryset()
+            .prefetch_related("labeled_elements")
+            .annotate(nlabels=models.Count("labeled_elements"))
+        )
+
+
 class LabeledSample(models.Model):
+
+    objects = LabeledSampleManager()
+
     original_sample = models.OneToOneField(
         Sample,
         related_name="labeled_sample",

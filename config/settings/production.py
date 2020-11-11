@@ -72,23 +72,22 @@ SECURE_CONTENT_TYPE_NOSNIFF = env.bool(
 #
 # https://django-storages.readthedocs.io/en/latest/#installation
 INSTALLED_APPS += ["storages"]  # noqa F405
-GS_BUCKET_NAME = env("DJANGO_GCP_STORAGE_BUCKET_NAME")
-GS_DEFAULT_ACL = "publicRead"
-GS_CUSTOM_ENDPOINT = f"https://{GS_BUCKET_NAME}.storage.googleapis.com"
-
-CORS_ALLOWED_ORIGINS = [
-    GS_CUSTOM_ENDPOINT,
-]
 
 # STATIC
 # ------------------------
+GS_STATIC_BUCKET_NAME = env("DJANGO_GCP_STORAGE_BUCKET_NAME")
 STATICFILES_STORAGE = "fta.utils.storages.StaticRootGoogleCloudStorage"
-STATIC_URL = f"https://{GS_BUCKET_NAME}.storage.googleapis.com/{GS_BUCKET_NAME}/static/"
+STATIC_URL = f"https://{GS_STATIC_BUCKET_NAME}.storage.googleapis.com/{GS_STATIC_BUCKET_NAME}/static/"
+CORS_ALLOWED_ORIGINS = [f"https://{GS_STATIC_BUCKET_NAME}.storage.googleapis.com"]
 
 # MEDIA
 # ------------------------------------------------------------------------------
+GS_MEDIA_BUCKET_NAME = env("DJANGO_GCP_MEDIA_BUCKET_NAME")
 DEFAULT_FILE_STORAGE = "fta.utils.storages.MediaRootGoogleCloudStorage"
-MEDIA_URL = f"https://{GS_BUCKET_NAME}.storage.googleapis.com/{GS_BUCKET_NAME}/media/"
+MEDIA_URL = (
+    f"https://{GS_MEDIA_BUCKET_NAME}.storage.googleapis.com/{GS_MEDIA_BUCKET_NAME}/"
+)
+
 
 # EMAIL
 #

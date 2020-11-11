@@ -4,17 +4,7 @@ from django.utils.html import format_html
 from django_tables2.utils import A
 
 from .models import Sample
-
-suffixes = ["B", "KB", "MB", "GB", "TB", "PB"]
-
-
-def humansize(nbytes):
-    i = 0
-    while nbytes >= 1024 and i < len(suffixes) - 1:
-        nbytes /= 1024.0
-        i += 1
-    f = ("%.2f" % nbytes).rstrip("0").rstrip(".")
-    return "%s %s" % (f, suffixes[i])
+from .utils import humansize
 
 
 class SampleTable(tables.Table):

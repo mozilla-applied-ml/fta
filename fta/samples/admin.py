@@ -8,7 +8,11 @@ from django.core.files.storage import get_storage_class
 from django.template.defaultfilters import truncatechars
 
 from .models import Label, LabeledElement, LabeledSample, Sample
-from .utils import convert_labeled_sample_to_fathom_sample, humansize
+from .utils import (
+    convert_labeled_sample_to_fathom_sample,
+    get_splits_from_queryset,
+    humansize,
+)
 
 
 @admin.register(Label)
@@ -102,11 +106,16 @@ class LabeledSampleAdmin(admin.ModelAdmin):
         storage_class = get_storage_class()
         storage = storage_class()
         folder = f"{datetime.now():%Y-%m-%d}-{str(uuid4())[0:6]}"
-        for sample in queryset:
-            processed_sample = convert_labeled_sample_to_fathom_sample(sample)
-            storage.save(
-                name=f"{folder}/{sample.pk}", content=ContentFile(processed_sample)
-            )
+        split_dict = get_splits_from_queryset(qs=queryset, train_pct=0.6, test_pct=0.2)
+        for split_type, sample_set in split_dict.items():
+            for sample in sample_set:
+                processed_sample, suffix = convert_labeled_sample_to_fathom_sample(
+                    sample
+                )
+                storage.save(
+                    name=f"{folder}/{split_type}/{sample.pk}{suffix}",
+                    content=ContentFile(processed_sample),
+                )
 
         self.message_user(
             request,

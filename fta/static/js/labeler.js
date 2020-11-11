@@ -3,7 +3,8 @@ import { v4 as uuidv4 } from "https://jspm.dev/uuid@8.3.1";
 // Create a new DOM element with tag `tag`, set attributes in `attrs`.
 // If `attrs` contains inner objects that exist in the created element, recurse
 // and set nested properties, eg. element.style.display.
-function $new(tag, attrs) {
+function $new(tag, attrs)
+{
     function set_attrs(target, attrs) {
         for (const property in attrs) {
             if (typeof attrs[property] === "object" && typeof target[property] !== "undefined") {
@@ -18,7 +19,8 @@ function $new(tag, attrs) {
     return el;
 }
 
-function createOverlayDiv(options) {
+function createOverlayDiv(options)
+{
     options = options || {};
     return $new("div", {
         style: {
@@ -34,7 +36,8 @@ function createOverlayDiv(options) {
 
 // Computes top/left/width/height position values relative to outer viewport for
 // the `element` element, which may be nested several iframes deep.
-function outerRelativePositionForElement(element) {
+function outerRelativePositionForElement(element)
+{
     const rect = element.getBoundingClientRect();
     let result = {
         top: rect.top,
@@ -53,12 +56,23 @@ function outerRelativePositionForElement(element) {
         result.left = result.left + frameRect.left;
     } while (next !== null);
 
+    const outermostRect = current.getBoundingClientRect();
+
+    // Remove section hidden by scrolled outermost iframe
+    if (outermostRect.top > result.top) {
+        result.height -= outermostRect.top - result.top;
+    }
+
+    // Clamp top to outermost iframe
+    result.top = Math.max(result.top, outermostRect.top);
+
     return result;
 }
 
 // Positions (absolutely) `overlay` (lives in outer page) over `tracked_element`
-// (lives in `iframe`).
-function updateOverlayPosition(iframe, overlay, tracked_element) {
+// (lives in `iframe` - potentially in a nested iframe).
+function updateOverlayPosition(iframe, overlay, tracked_element)
+{
     const absolutePos = outerRelativePositionForElement(tracked_element);
     overlay.style.top = absolutePos.top + "px";
     overlay.style.left = absolutePos.left + "px";
@@ -66,7 +80,8 @@ function updateOverlayPosition(iframe, overlay, tracked_element) {
     overlay.style.height = absolutePos.height + "px";
 }
 
-function createOverlayForPickedElement(iframe, pickedElement, pickedElementsMap, remover=true) {
+function createOverlayForPickedElement(iframe, pickedElement, pickedElementsMap, remover=true)
+{
     const taggedOverlay = createOverlayDiv({
         bgcolor: "red",
         transition: "none", // These should track scrolling without animations
@@ -129,7 +144,8 @@ function createOverlayForPickedElement(iframe, pickedElement, pickedElementsMap,
     return taggedOverlay;
 }
 
-function handleFormSubmit(iframe, pickedElementsMap) {
+function handleFormSubmit(iframe, pickedElementsMap)
+{
     let labelData = [];
     let id = '';
 
@@ -153,53 +169,126 @@ function handleFormSubmit(iframe, pickedElementsMap) {
     document.querySelector("input[name='updated-sample']").value = iframe.contentDocument.documentElement.outerHTML;
 }
 
-// Create element picking and labeling UI for a loaded iframe
+// For all elements of preExistingLables in this iframe, add overlay.
+// Overlay does not have a remove button. Tags can only be removed through backend.
+function createOverlaysForPreExistingLabels({
+        // HTMLIFrameElement
+        iframe,
+        // List of pre-existing labels ({fta_id, label} objects)
+        preExistingLabels,
+        // Map of picked elements to corresponding overlay div, will be modified
+        pickedElementsMap
+    })
+{
+    for (const [fta_id, label] of preExistingLabels) {
+        const el = iframe.contentDocument.body.querySelector("[data-fta_id='" + fta_id + "']");
+        if (el) {
+            const overlay = createOverlayForPickedElement(
+                iframe, element, pickedElementsMap, /*remover=*/false
+            );
+            overlay.querySelector(".tag-input").value = label;
+            pickedElementsMap.set(element, {
+                overlay: overlay,
+                tag: label,
+            });
+        }
+    }
+}
+
+// Detecting when iframes are (fully) loaded is frail with race conditions
+// This code is extremely hacky with timeouts and intervals, but it's the only
+// way to make it reliable against all possible timings.
+function callWhenLoaded(iframe, callback) {
+    // IFrame has a document
+    if (iframe.contentDocument !== null) {
+        // ...but body is still null, loading
+        if (iframe.contentDocument.body === null) {
+            // We try until body is non null
+            const interval = setInterval(function() {
+                if (iframe.contentDocument.body !== null) {
+                    clearInterval(interval);
+                    callback();
+                }
+            }, 100);
+        } else {
+            // ...body is non null, but it can still not have its children
+            // elements, so we give the event loop some time. This could still
+            // break given that it's a single timeout with a fixed time but
+            // there's no way to directly test if the iframe is fully loaded.
+            setTimeout(function() {
+                callback();
+            }, 100);
+        }
+    } else {
+        // IFrame doesn't have a document, so we wait for the load event, this
+        // is the simple case.
+        iframe.addEventListener("load", function() {
+            callback()
+        });
+    }
+}
+
+// Create element picking and labeling UI for a potentially still loading iframe
 function createPickingUiForIframe({
-        // iFrame content
+        // HTMLIFrameElement
         iframe,
         // Toggle picker on and off
         toggleBtn,
         // Form submit button
         submitBtn,
-        // Map of picked elements to corresponding overlay div
-        pickedElementsMap=new Map(),
         // Should picker be active on launch
         startPicking=true,
-    }) {
+        // List of pre-existing labels to display in page ({fta_id, label} keys)
+        preExistingLabels=[],
+    })
+{
+    callWhenLoaded(iframe, function() {
+        createPickingUiForLoadedIframe({
+          iframe, toggleBtn, submitBtn, startPicking
+        });
+    });
+}
 
+// Create element picking and labeling UI for a loaded iframe
+function createPickingUiForLoadedIframe({
+        // HTMLIFrameElement
+        iframe,
+        // Toggle picker on and off
+        toggleBtn,
+        // Form submit button
+        submitBtn,
+        // Should picker be active on launch
+        startPicking=true,
+        // List of pre-existing labels to display in page ({fta_id, label} keys)
+        preExistingLabels=[],
+    })
+{
     const subdoc = iframe.contentDocument;
     let picking = startPicking;
+
+    // Map of picked elements to corresponding overlay div
+    let pickedElementsMap = new Map();
 
     // Overlay element lives in this document to avoid polutting the iframe
     // document as much as possible. We simply reposition it over the
     // corresponding element in the iframe.
     let overlay = createOverlayDiv();
+    let currentlyHovered = subdoc.body;
     document.body.appendChild(overlay);
 
-
-    // For all elements of pickedElementsMap, add overlay
-    // Overlay does not have a remove button. Tags can only be
-    // removed through back end.
-    pickedElementsMap.forEach(({overlay, tag}, element) => {
-        if (element.dataset.fta_id) {
-            let overlay = createOverlayForPickedElement(
-                iframe, element, pickedElementsMap, false
-            );
-            overlay.querySelector(".tag-input").value = tag;
-            pickedElementsMap.set(element, {
-                overlay: overlay,
-                tag: tag,
-            });
-        }
+    createOverlaysForPreExistingLabels({
+        iframe,
+        preExistingLabels,
+        pickedElementsMap,
     });
-
 
     // Position overlay div over the hovered element
     function hoverHandler(e) {
         if (!picking) {
             return;
         }
-        updateOverlayPosition(iframe, overlay, e.target);
+        currentlyHovered = e.target;
+        updateOverlayPosition(iframe, overlay, currentlyHovered);
     }
 
     // Stop element picker, set picked element and focus tag input
@@ -225,8 +314,11 @@ function createPickingUiForIframe({
 
     function hookAllElements(body) {
         for (const el of body.querySelectorAll("*")) {
-            if (el instanceof HTMLIFrameElement && el.contentDocument !== null) {
-                hookAllElements(el.contentDocument.body);
+            if (el instanceof HTMLIFrameElement) {
+                callWhenLoaded(el, function() {
+                    hookAllElements(el.contentDocument.body);
+                    updateOverlaysOnScroll(el.contentWindow);
+                });
             } else {
                 el.addEventListener("mouseover", hoverHandler);
                 el.addEventListener("click", clickHandler);
@@ -238,19 +330,25 @@ function createPickingUiForIframe({
     hookAllElements(subdoc.body);
 
     // Update fixed overlays when parent document is scrolled
-    let ticking = false;
-    window.addEventListener("scroll", function(e) {
-        if (!ticking) {
-            window.requestAnimationFrame(function() {
-                for (const [element, {overlay, tag}] of pickedElementsMap) {
-                    updateOverlayPosition(iframe, overlay, element);
-                }
-                ticking = false;
-            });
+    function updateOverlaysOnScroll(win) {
+        let ticking = false;
+        win.addEventListener("scroll", function(e) {
+            if (!ticking) {
+                window.requestAnimationFrame(function() {
+                    for (const [element, {overlay, tag}] of pickedElementsMap) {
+                        updateOverlayPosition(iframe, overlay, element);
+                    }
+                    updateOverlayPosition(iframe, overlay, currentlyHovered);
+                    ticking = false;
+                });
 
-            ticking = true;
-        }
-    });
+                ticking = true;
+            }
+        });
+    }
+
+    updateOverlaysOnScroll(window);
+    updateOverlaysOnScroll(iframe.contentWindow);
 
     if (typeof toggleBtn !== "undefined") {
         toggleBtn.addEventListener("click", function() {
@@ -267,6 +365,8 @@ function createPickingUiForIframe({
             handleFormSubmit(iframe, pickedElementsMap);
         });
     }
+
+    document.querySelector(".picker-loading-overlay").classList.add("hidden");
 }
 
 export { createPickingUiForIframe };

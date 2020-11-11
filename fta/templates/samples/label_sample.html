@@ -26,8 +26,10 @@
 </dl>
 {% crispy form %}
 
-<iframe id="iframe" width="{{ sample.original_sample.page_width|default:1366 }}" height="{{ sample.original_sample.page_height|default:768 }}" srcdoc="{{ sample.modified_sample|escape }}"></iframe>
-
+<div class="iframe-container" style="width: {{ sample.original_sample.page_width|default:1366 }}px; height: {{ sample.original_sample.page_height|default:768 }}px">
+<iframe id="iframe" class="frozen-page-iframe" srcdoc="{{ sample.modified_sample|escape }}"></iframe>
+<div class="picker-loading-overlay"><p class="h-center">Element picker is loading...</p></div>
+</div>
 {% endblock content %}
 {% block extrajavascript %}
 <script type="module">
@@ -38,32 +40,20 @@ document.addEventListener("DOMContentLoaded", function() {
     const toggleBtn = document.getElementById("toggle-picking");
     const submitBtn = document.getElementById("submit-labels");
     const startPicking = document.getElementById("toggle-picking").checked;
-    let pickedElementsMap = new Map();
 
-    function updatePickedElementsMap({iframe, pickedElementsMap}) {
-      let element = null;
+    let preExistingLabels = [
       {% for label in labeled_elements %}
-        element = iframe.contentDocument.querySelector("[data-fta_id='{{ label.data_fta_id }}']")
-        pickedElementsMap.set(element, {
-            overlay: null,
-            tag: "{{ label.label }}",
-        });
+        {fta_id: "{{ label.data_fta_id }}", label: "{{ label.label }}"},
       {% endfor %}
+    ];
 
-    }
-
-    const initializer = {
-      iframe, toggleBtn, submitBtn, pickedElementsMap, startPicking
-    };
-    if (iframe.contentDocument !== null) {
-      updatePickedElementsMap({iframe, pickedElementsMap});
-      createPickingUiForIframe(initializer);
-    } else {
-        iframe.addEventListener("load", function() {
-          updatePickedElementsMap({iframe, pickedElementsMap});
-          createPickingUiForIframe(initializer);
-        });
-    }
+    createPickingUiForIframe({
+      iframe,
+      toggleBtn,
+      submitBtn,
+      startPicking,
+      preExistingLabels,
+    });
 });
 </script>
 {% endblock extrajavascript %}

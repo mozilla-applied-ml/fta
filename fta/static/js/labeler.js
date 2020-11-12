@@ -78,6 +78,11 @@ function updateOverlayPosition(iframe, overlay, tracked_element)
     overlay.style.left = absolutePos.left + "px";
     overlay.style.width = absolutePos.width + "px";
     overlay.style.height = absolutePos.height + "px";
+    if (absolutePos.height <= 0) {
+        overlay.style.visibility = "hidden";
+    } else {
+        overlay.style.visibility = "visible";
+    }
 }
 
 function createOverlayForPickedElement(iframe, pickedElement, pickedElementsMap, remover=true)
@@ -147,14 +152,14 @@ function createOverlayForPickedElement(iframe, pickedElement, pickedElementsMap,
 function handleFormSubmit(iframe, pickedElementsMap)
 {
     let labelData = [];
-    let id = '';
+    let id = "";
 
     for (const [element, data] of pickedElementsMap) {
         const label = data.tag;
         if (label === "") {
             continue;
         }
-        if (element.dataset.hasOwnProperty('fta_id')) {
+        if (element.dataset.hasOwnProperty("fta_id")) {
             id = element.dataset.fta_id;
         } else {
             id = uuidv4();
@@ -180,14 +185,14 @@ function createOverlaysForPreExistingLabels({
         pickedElementsMap
     })
 {
-    for (const [fta_id, label] of preExistingLabels) {
+    for (const {fta_id, label} of preExistingLabels) {
         const el = iframe.contentDocument.body.querySelector("[data-fta_id='" + fta_id + "']");
         if (el) {
             const overlay = createOverlayForPickedElement(
-                iframe, element, pickedElementsMap, /*remover=*/false
+                iframe, el, pickedElementsMap, /*remover=*/false
             );
             overlay.querySelector(".tag-input").value = label;
-            pickedElementsMap.set(element, {
+            pickedElementsMap.set(el, {
                 overlay: overlay,
                 tag: label,
             });
@@ -244,7 +249,7 @@ function createPickingUiForIframe({
 {
     callWhenLoaded(iframe, function() {
         createPickingUiForLoadedIframe({
-          iframe, toggleBtn, submitBtn, startPicking
+          iframe, toggleBtn, submitBtn, startPicking, preExistingLabels
         });
     });
 }
@@ -318,6 +323,9 @@ function createPickingUiForLoadedIframe({
                 callWhenLoaded(el, function() {
                     hookAllElements(el.contentDocument.body);
                     updateOverlaysOnScroll(el.contentWindow);
+                    createOverlaysForPreExistingLabels({
+                        iframe: el, preExistingLabels, pickedElementsMap
+                    });
                 });
             } else {
                 el.addEventListener("mouseover", hoverHandler);

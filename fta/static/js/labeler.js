@@ -149,6 +149,15 @@ function createOverlayForPickedElement(iframe, pickedElement, pickedElementsMap,
     return taggedOverlay;
 }
 
+// Recursively update iframe srcdoc attributes with serialization of modified DOM
+function updateNestedIframesSrcdoc(iframe)
+{
+    for (const nested of iframe.contentDocument.querySelectorAll("iframe")) {
+        updateNestedIframesSrcdoc(nested);
+        nested.srcdoc = nested.contentDocument.documentElement.outerHTML;
+    }
+}
+
 function handleFormSubmit(iframe, pickedElementsMap)
 {
     let labelData = [];
@@ -170,6 +179,11 @@ function handleFormSubmit(iframe, pickedElementsMap)
             label: data.tag
         });
     }
+
+    // We update DOM elements above with fta_id, now we update the srcdoc attr
+    // of iframes so that changes are represented in the updated source we POST.
+    updateNestedIframesSrcdoc(iframe);
+
     document.querySelector("input[name='label-data']").value = JSON.stringify(labelData);
     document.querySelector("input[name='updated-sample']").value = iframe.contentDocument.documentElement.outerHTML;
 }

@@ -80,7 +80,7 @@ class SampleLabelView(LoginRequiredMixin, FormView):
         # This is only okay while all this is behind a managed login.
         self.sample.modified_sample = request.POST.get("updated-sample", "")
         self.sample.save()
-        label_data_list = json.loads(request.POST.get("label-data", ""))
+        label_data_list = json.loads(request.POST.get("label-data", "[]"))
         for label_data in label_data_list:
             label, _ = Label.objects.get_or_create(slug=label_data["label"])
             # Make sure that the label overrides the old one.

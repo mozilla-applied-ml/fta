@@ -6,6 +6,8 @@ from django.contrib import admin, messages
 from django.core.files.base import ContentFile
 from django.core.files.storage import get_storage_class
 from django.template.defaultfilters import truncatechars
+from django.urls import reverse
+from django.utils.html import format_html
 
 from .models import Label, LabeledElement, LabeledSample, Sample
 from .utils import (
@@ -134,8 +136,14 @@ class LabeledSampleAdmin(admin.ModelAdmin):
     )
 
     # Display
+
+    def view_on_site(self, obj):
+        # Take user to labeling view
+        return reverse("label", kwargs={"sample": obj.original_sample.pk})
+
     list_display = (
         "id",
+        "view_on_site_link",
         "nlabels",
         "labels",
         "page_size",
@@ -143,6 +151,13 @@ class LabeledSampleAdmin(admin.ModelAdmin):
         "freeze_time",
         "freeze_software",
     )
+
+    def view_on_site_link(self, obj):
+        url = self.view_on_site(obj)
+        return format_html(f"<a href='{url}'>{obj.original_sample.pk}</a>")
+
+    view_on_site_link.admin_order_field = "original_sample"
+    view_on_site_link.short_description = "Go to labeler"
 
     def nlabels(self, obj):
         return obj.nlabels

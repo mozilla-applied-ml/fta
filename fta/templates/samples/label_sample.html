@@ -8,6 +8,7 @@
 
 {% block content %}
 <h2>{% trans "Label sample" %}</h2>
+<div class="sample-info-and-source-container">
 <dl class="sample-info-table">
   <dt>{% trans "Sample id" %}</dt>
   <dd>{{ sample.original_sample.id }}</dd>
@@ -24,6 +25,9 @@
   <dt>{% trans "Add new labels" %}</dt>
   <dd><input type="checkbox" id="toggle-picking" checked>  Uncheck to disable labeling</dd>
 </dl>
+<div id="source-container" class="source-container"></div>
+</div>
+
 {% crispy form %}
 
 <div class="iframe-container" style="width: {{ sample.original_sample.page_width|default:1366 }}px; height: {{ sample.original_sample.page_height|default:768 }}px">
@@ -40,6 +44,7 @@ document.addEventListener("DOMContentLoaded", function() {
     const toggleBtn = document.getElementById("toggle-picking");
     const submitBtn = document.getElementById("submit-labels");
     const startPicking = document.getElementById("toggle-picking").checked;
+    const sourceTextElem = document.getElementById("source-container");
 
     let preExistingLabels = [
       {% for label in labeled_elements %}
@@ -51,6 +56,7 @@ document.addEventListener("DOMContentLoaded", function() {
       iframe,
       toggleBtn,
       submitBtn,
+      sourceTextElem,
       startPicking,
       preExistingLabels,
     });

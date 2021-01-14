@@ -47,11 +47,15 @@
 	border-right: 5px solid transparent;
 }
 
+.sample-info-and-source-container {
+    display: flex;
+}
 
 .sample-info-table {
     display: flex;
     flex-flow: row wrap;
     margin-bottom: 3px;
+    flex: 0 0 50%;
 }
 
 .sample-info-table > * {
@@ -59,11 +63,20 @@
 }
 
 .sample-info-table > dt {
-    flex: 0 0 250px;
+    flex: 0 0 25%;
 }
 
 .sample-info-table > dd {
-    flex: 1 1 75%;
+    flex: 0 0 75%;
+}
+
+.source-container {
+    flex: 0 0 50%;
+    font-family: monospace;
+    max-width: 600px;
+    max-height: 100px;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .iframe-container {

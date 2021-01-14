@@ -85,6 +85,11 @@ function updateOverlayPosition(iframe, overlay, tracked_element)
     }
 }
 
+function updateSourceBox(sourceTextElem, trackedElement)
+{
+    sourceTextElem.textContent = trackedElement.outerHTML;
+}
+
 function createOverlayForPickedElement(iframe, pickedElement, pickedElementsMap, remover=true)
 {
     const taggedOverlay = createOverlayDiv({
@@ -255,6 +260,8 @@ function createPickingUiForIframe({
         toggleBtn,
         // Form submit button
         submitBtn,
+        // Element to use to display source of currently hovered element
+        sourceTextElem,
         // Should picker be active on launch
         startPicking=true,
         // List of pre-existing labels to display in page ({fta_id, label} keys)
@@ -263,7 +270,7 @@ function createPickingUiForIframe({
 {
     callWhenLoaded(iframe, function() {
         createPickingUiForLoadedIframe({
-          iframe, toggleBtn, submitBtn, startPicking, preExistingLabels
+          iframe, toggleBtn, submitBtn, sourceTextElem, startPicking, preExistingLabels
         });
     });
 }
@@ -276,6 +283,8 @@ function createPickingUiForLoadedIframe({
         toggleBtn,
         // Form submit button
         submitBtn,
+        // Element to use to display source of currently hovered element
+        sourceTextElem,
         // Should picker be active on launch
         startPicking=true,
         // List of pre-existing labels to display in page ({fta_id, label} keys)
@@ -308,6 +317,7 @@ function createPickingUiForLoadedIframe({
         }
         currentlyHovered = e.target;
         updateOverlayPosition(iframe, overlay, currentlyHovered);
+        updateSourceBox(sourceTextElem, currentlyHovered);
     }
 
     // Stop element picker, set picked element and focus tag input

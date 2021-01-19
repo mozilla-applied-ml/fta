@@ -30,13 +30,20 @@ class SampleTable(tables.Table):
     def render_labels(self, value, record):
         default = format_html('<a href="?label=-">-</a>')
         if hasattr(record, "labeled_sample"):
-            labeled_elements = record.labeled_sample.labeled_elements.all()
-            labels = labeled_elements.values_list("label__slug", flat=True).distinct()
-            if labels:
-                label_links = [
-                    f'<a href="?label={label}">{label}</a>' for label in labels
-                ]
-                return format_html(", ".join(label_links))
+            # This was a one-to-one relationship but is now a FK relationship so there can be more than 1
+            # LabeledSample for the Sample.  However the default filtering is superseded_by=None so only 1 is returned.
+            if record.labeled_sample.all().exists():
+                labeled_elements = (
+                    record.labeled_sample.all().first().labeled_elements.all()
+                )
+                labels = labeled_elements.values_list(
+                    "label__slug", flat=True
+                ).distinct()
+                if labels:
+                    label_links = [
+                        f'<a href="?label={label}">{label}</a>' for label in labels
+                    ]
+                    return format_html(", ".join(label_links))
         return default
 
     def order_labels(self, queryset, is_descending):

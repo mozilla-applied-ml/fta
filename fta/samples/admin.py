@@ -88,6 +88,9 @@ class LabelListFilter(admin.SimpleListFilter):
 class LabeledSampleAdmin(admin.ModelAdmin):
     list_select_related = True
 
+    # Currently not a modifiable field, do not expose.
+    exclude = ["superseded_by"]
+
     # Search - only filters labels
     search_fields = ["labeled_elements__label__slug"]
 

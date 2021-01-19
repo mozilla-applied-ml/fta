@@ -107,7 +107,7 @@ def get_frozen_metadata(page, freeze_software):
     page_height = None
     try:
         if freeze_software == "SingleFile":
-            soup = BeautifulSoup(page)
+            soup = BeautifulSoup(page, features="html.parser")
             singlefile_comment = soup.html.contents[0]
             pieces = singlefile_comment.strip().split("\n")
             assert pieces[0].startswith("Page saved with SingleFile")
@@ -119,7 +119,7 @@ def get_frozen_metadata(page, freeze_software):
                 page_width = int(pieces[3].split("window width:")[1])
                 page_height = int(pieces[4].split("window height:")[1])
         elif freeze_software == "freezedry":
-            soup = BeautifulSoup(page)
+            soup = BeautifulSoup(page, features="html.parser")
             freezedry_link = soup.find("link", rel="original")
             freezedry_datetime = soup.find(
                 "meta",

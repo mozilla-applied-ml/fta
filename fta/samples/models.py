@@ -10,7 +10,6 @@ class SampleManager(models.Manager):
         return (
             super()
             .get_queryset()
-            .select_related("labeled_sample")
             .prefetch_related("labeled_sample__labeled_elements")
             .annotate(nlabels=models.Count("labeled_sample__labeled_elements"))
         )
@@ -88,6 +87,7 @@ class LabeledSampleManager(models.Manager):
         return (
             super()
             .get_queryset()
+            .filter(superseded_by=None)
             .prefetch_related("labeled_elements")
             .annotate(nlabels=models.Count("labeled_elements"))
         )
@@ -97,14 +97,23 @@ class LabeledSample(models.Model):
 
     objects = LabeledSampleManager()
 
-    original_sample = models.OneToOneField(
-        Sample,
+    original_sample = models.ForeignKey(
+        to=Sample,
         related_name="labeled_sample",
         on_delete=models.CASCADE,
         blank=False,
         null=False,
         help_text="Link to the original sample",
     )
+
+    superseded_by = models.ForeignKey(
+        to="self",
+        related_name="superseded_labeled_samples",
+        on_delete=models.SET_NULL,
+        blank=False,
+        null=True,
+    )
+
     modified_sample = models.TextField(
         help_text="Sample page modified with labeling ids. This is mutable.",
         blank=False,
@@ -130,7 +139,14 @@ class Label(models.Model):
         return self.slug
 
 
+class LabeledElementManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(labeled_sample__superseded_by=None)
+
+
 class LabeledElement(models.Model):
+    objects = LabeledElementManager()
+
     labeled_sample = models.ForeignKey(
         to=LabeledSample,
         related_name="labeled_elements",

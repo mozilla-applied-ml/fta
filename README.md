@@ -67,8 +67,9 @@ Need a `.env` file with, at least, the following entries:
   * DB_PASSWORD
   * CLOUD_SQL_INSTANCE_ID
   * DJANGO_SECURE_SSL_REDIRECT=False  (otherwise will have a hard time running locally)
-  * DJANGO_ALLOWED_HOSTS=localhost,
+  * DJANGO_ALLOWED_HOSTS=localhost
   * DJANGO_GCP_STORAGE_BUCKET_NAME
+  * DJANGO_GCP_MEDIA_BUCKET_NAME
 
 Production settings will look for a cloudsql database. If you want to connect to the production database or a test cloud database you've setup, use [cloud sql proxy](https://cloud.google.com/sql/docs/mysql/sql-proxy). The settings are currently setup to expect the proxy port to be at 5454, so set cloud sql proxy appropriately (`./cloud_sql_proxy -instances="<instance id\>"=tcp:5454`)
 
